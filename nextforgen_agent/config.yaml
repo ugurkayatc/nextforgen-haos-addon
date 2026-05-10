@@ -1,0 +1,50 @@
+name: "NextForGen Agent"
+description: "NextForGen akıllı ev platformu hub bağlantı ajanı. Cihazlarınızı NextForGen uygulamasından yönetmenizi sağlar."
+version: "1.0.0"
+slug: "nextforgen_agent"
+url: "https://nextforgen.com"
+arch:
+  - aarch64
+init: false
+
+# HAOS API erişimleri
+hassio_api: true
+homeassistant_api: true
+auth_api: false
+
+# SUPERVISOR_TOKEN bu addon'a otomatik inject edilir
+# Agent bunu HA erişimi için kullanır
+
+# Ağ yapılandırması
+host_network: false
+ports:
+  9100/tcp: 9100
+ports_description:
+  9100/tcp: "LAN fallback HTTPS endpoint (mobil lokal bağlantı)"
+
+# Kalıcı depolama
+map:
+  - addon_config:rw
+
+# Kullanıcı yapılandırma şeması
+options:
+  backend_url: "wss://api.nextforgen.com/hub"
+  bootstrap_code: ""
+  log_level: "info"
+  dev_mode: false
+
+schema:
+  backend_url: url
+  bootstrap_code: str
+  log_level: list(trace|debug|info|warning|error)
+  dev_mode: bool
+
+# Docker image (GitHub Container Registry)
+image: "ghcr.io/ugurkayatc/agent:{version}"
+
+# Servis boot sonrası kendiliğinden başlasın
+startup: services
+boot: auto
+
+# Watchdog — agent crash'lerse yeniden başlat
+watchdog: "tcp://[HOST]:9100"
