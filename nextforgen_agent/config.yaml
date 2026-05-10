@@ -40,7 +40,7 @@ schema:
   dev_mode: bool
 
 # Docker image (GitHub Container Registry)
-image: "ghcr.io/ugurkayatc/agent:{version}"
+image: "ghcr.io/ugurkayatc/agent"
 
 # Servis boot sonrası kendiliğinden başlasın
 startup: services
