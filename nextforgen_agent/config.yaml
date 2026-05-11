@@ -1,6 +1,6 @@
 name: "NextForGen Agent"
 description: "NextForGen akıllı ev platformu hub bağlantı ajanı. Cihazlarınızı NextForGen uygulamasından yönetmenizi sağlar."
-version: "1.1.3"
+version: "1.1.4"
 slug: "nextforgen_agent"
 url: "https://nextforgen.com"
 arch:

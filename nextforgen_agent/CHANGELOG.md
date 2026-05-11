@@ -1,26 +1,27 @@
 # Changelog
 
-## 1.1.3
+## 1.1.4
 
-- **KRİTİK cihaz akış bug**: HaWebSocketClient.ConnectAsync `subscribe_events` result'ını tüketmiyordu (`_ = ReceiveMessageAsync`) + `LoadRegistryAsync` Task.Run ile fire-and-forget. Sonuç: registry response'ları kaybediliyordu, OnRegistryLoaded tetiklenmiyordu, backend'e device.list mesajı hiç gitmiyordu. Düzeltme: subscribe result `await`, registry sequential `await`. İlk başlatmada `HA registry yüklendi: N device, M entity` INFO logı görünür.
-
-## 1.1.2
-
-- **KRİTİK altyapı düzeltmesi**: Cert path `/data/agent/cert.pfx` → `/config/cert.pfx`. HAOS addon konvansiyonu (`addon_config:rw` map'i ile persistent). Önceki sürümlerde addon restart sonrası cert kayboluyor, agent her seferinde yeniden bootstrap istiyordu (bootstrap kodu zaten kullanıldı 401). Artık restart'ta cert korunur.
-- StateBuffer SQLite `/config/state_buffer.db`'e otomatik taşınır (CertificateStore klasör tabanlı).
+- StateForwarder: HA `new_state: null` payload (entity silindiğinde) `InvalidOperationException` atıyordu — null-safe check eklendi (kritik crashloop fix)
+- HA registry değişikliklerine (MQTT discovery, Z2M pair, vb.) dinamik tepki: `device_registry_updated` + `entity_registry_updated` event'lerine subscribe + 3sn debounce ile reload, artık agent restart gerekmiyor
+- Backend reconnect race fix: ilk bağlantıda boş `device.list` array'i göndermiyor; registry hazır olunca cache'den dolu liste enqueue ediliyor (önceki davranışta backend tüm cihazları offline yapıyordu)
+- HA WS receive loop: tek event handler exception'ı tüm bağlantıyı kırmıyor, log atıp devam ediyor
 
 ## 1.1.1
 
-- 1.1.0 imajında run.sh CRLF nedeniyle başlatılamıyordu. Dockerfile'a `sed -i 's/\r$//'` savunma + .gitattributes ile `*.sh eol=lf`.
+- run.sh CRLF hotfix (Windows host'ta Docker build sırasında CRLF dönüşümüne savunma)
+- Cert path `/data/agent` → `/config` (HAOS addon update'lerinde `/data` volume sıfırlanabiliyor; `/config` (addon_config) persistent)
+- HA registry race condition fix: subscribe result'ı tüket + sequential await
 
 ## 1.1.0
 
-- Cert otomatik yenileme: agent expire'a 30 gün kala backend'e `/api/hub/renew-cert` mTLS POST'u atar, atomik save sonrası reconnect.
-- Offline state buffer SQLite (WAL mode): agent restart sonrası kritik sensör event'leri kayıp yaşamaz.
-- Reconnect backoff'a ±20% jitter (thundering herd koruması).
-- Backend tarafı: `ConnectionRateLimiter`, `IHubBackplane` (Redis Pub/Sub scale-out hazırlığı, default NoOp), partial indexler, Location PreviousCert kolonları.
+- Cert otomatik yenileme uygulandı: agent expire'a 30 gün kala backend'e `/api/hub/renew-cert` mTLS POST'u atar, atomik save sonrası reconnect tetikler
+- Offline state buffer SQLite'a alındı (WAL mode): agent restart sonrası kritik sensör event'leri kayıp yaşamaz
+- Reconnect backoff'a ±20% jitter eklendi: çoklu hub durumunda thundering herd koruması
+- Backend tarafı (sadece referans için): `ConnectionRateLimiter` (429 ile reconnect storm koruması), `IHubBackplane` (Redis Pub/Sub ile scale-out hazırlığı, default NoOp), Devices/Rooms/Automations partial indexes, Location PreviousCert kolonları (renewal grace period)
 
 ## 1.0.0
+
 - İlk sürüm
 - mTLS ile Azure backend bağlantısı (outbound WebSocket)
 - Zigbee (Z2M) + Matter cihaz kontrolü
@@ -28,3 +29,4 @@
 - LAN fallback HTTPS endpoint (port 9100, self-signed cert)
 - mDNS service discovery (`_nextforgen-hub._tcp.local`)
 - Bootstrap provisioning (tek kullanımlık kod)
+- Cert otomatik yenileme (30 gün öncesi)
