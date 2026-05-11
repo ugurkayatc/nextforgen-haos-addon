@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.3
+
+- **KRİTİK cihaz akış bug**: HaWebSocketClient.ConnectAsync `subscribe_events` result'ını tüketmiyordu (`_ = ReceiveMessageAsync`) + `LoadRegistryAsync` Task.Run ile fire-and-forget. Sonuç: registry response'ları kaybediliyordu, OnRegistryLoaded tetiklenmiyordu, backend'e device.list mesajı hiç gitmiyordu. Düzeltme: subscribe result `await`, registry sequential `await`. İlk başlatmada `HA registry yüklendi: N device, M entity` INFO logı görünür.
+
 ## 1.1.2
 
 - **KRİTİK altyapı düzeltmesi**: Cert path `/data/agent/cert.pfx` → `/config/cert.pfx`. HAOS addon konvansiyonu (`addon_config:rw` map'i ile persistent). Önceki sürümlerde addon restart sonrası cert kayboluyor, agent her seferinde yeniden bootstrap istiyordu (bootstrap kodu zaten kullanıldı 401). Artık restart'ta cert korunur.
