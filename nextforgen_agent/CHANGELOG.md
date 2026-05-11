@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+- 1.1.0 imajında run.sh CRLF nedeniyle başlatılamıyordu (`exec /run.sh: no such file or directory`). Dockerfile'a `sed -i 's/\r$//'` savunma + .gitattributes ile `*.sh eol=lf` kalıcı düzeltme.
+
 ## 1.1.0
 
 - Cert otomatik yenileme uygulandı: agent expire'a 30 gün kala backend'e `/api/hub/renew-cert` mTLS POST'u atar, atomik save sonrası reconnect tetikler
