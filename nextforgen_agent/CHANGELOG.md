@@ -1,18 +1,22 @@
 # Changelog
 
+## 1.1.2
+
+- **KRİTİK altyapı düzeltmesi**: Cert path `/data/agent/cert.pfx` → `/config/cert.pfx`. HAOS addon konvansiyonu (`addon_config:rw` map'i ile persistent). Önceki sürümlerde addon restart sonrası cert kayboluyor, agent her seferinde yeniden bootstrap istiyordu (bootstrap kodu zaten kullanıldı 401). Artık restart'ta cert korunur.
+- StateBuffer SQLite `/config/state_buffer.db`'e otomatik taşınır (CertificateStore klasör tabanlı).
+
 ## 1.1.1
 
-- 1.1.0 imajında run.sh CRLF nedeniyle başlatılamıyordu (`exec /run.sh: no such file or directory`). Dockerfile'a `sed -i 's/\r$//'` savunma + .gitattributes ile `*.sh eol=lf` kalıcı düzeltme.
+- 1.1.0 imajında run.sh CRLF nedeniyle başlatılamıyordu. Dockerfile'a `sed -i 's/\r$//'` savunma + .gitattributes ile `*.sh eol=lf`.
 
 ## 1.1.0
 
-- Cert otomatik yenileme uygulandı: agent expire'a 30 gün kala backend'e `/api/hub/renew-cert` mTLS POST'u atar, atomik save sonrası reconnect tetikler
-- Offline state buffer SQLite'a alındı (WAL mode): agent restart sonrası kritik sensör event'leri kayıp yaşamaz
-- Reconnect backoff'a ±20% jitter eklendi: çoklu hub durumunda thundering herd koruması
-- Backend tarafı (sadece referans): `ConnectionRateLimiter` (429 ile reconnect storm koruması), `IHubBackplane` (Redis Pub/Sub scale-out hazırlığı, default NoOp), partial indexler, Location PreviousCert kolonları (renewal grace period)
+- Cert otomatik yenileme: agent expire'a 30 gün kala backend'e `/api/hub/renew-cert` mTLS POST'u atar, atomik save sonrası reconnect.
+- Offline state buffer SQLite (WAL mode): agent restart sonrası kritik sensör event'leri kayıp yaşamaz.
+- Reconnect backoff'a ±20% jitter (thundering herd koruması).
+- Backend tarafı: `ConnectionRateLimiter`, `IHubBackplane` (Redis Pub/Sub scale-out hazırlığı, default NoOp), partial indexler, Location PreviousCert kolonları.
 
 ## 1.0.0
-
 - İlk sürüm
 - mTLS ile Azure backend bağlantısı (outbound WebSocket)
 - Zigbee (Z2M) + Matter cihaz kontrolü
@@ -20,4 +24,3 @@
 - LAN fallback HTTPS endpoint (port 9100, self-signed cert)
 - mDNS service discovery (`_nextforgen-hub._tcp.local`)
 - Bootstrap provisioning (tek kullanımlık kod)
-- Cert otomatik yenileme (30 gün öncesi)
