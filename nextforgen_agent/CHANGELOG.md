@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.5
+
+- Registry reload deadlock hotfix: 1.1.4'te eklenen dinamik discovery `LoadRegistryAsync`'i `Task.Run` ile paralel çağırıyordu — `ReceiveLoopAsync` ile aynı WS üzerinde concurrent `ReceiveAsync` olmaz, result mesajları event filter'ına takılıp kayboluyordu. Çözüm: reload sırasında WS `CloseAsync` ile kapatılıyor, outer reconnect döngüsü temiz yeniden bağlanıp `LoadRegistryAsync`'i tek-reader olarak çalıştırıyor.
+
 ## 1.1.4
 
 - StateForwarder: HA `new_state: null` payload (entity silindiğinde) `InvalidOperationException` atıyordu — null-safe check eklendi (kritik crashloop fix)
