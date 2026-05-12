@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.6
+
+- **Cihaz görünürlük filter (hassio integration skip):** HAOS addon'lar (NextForGen Agent, Tailscale, Mosquitto, File editor, Home Assistant Core, vs.) artık DB'ye gönderilmiyor. Filter HAOS'un `config_entries → domain = "hassio"` ayrımına dayanır, yanlış pozitif yok. HA WebSocket'e `config_entries/get` çağrısı eklendi; her cihazın `config_entries` field'ı kontrol edilir. Sonuç: backend'e sadece gerçek IoT cihazlar gider (Aqara, Sonoff, Yale, Matter cihazlar, RPi Power Status gibi fiziksel donanım dahil). Eklentiler DB'de **hiç görünmez**.
+
 ## 1.1.5
 
 - Registry reload deadlock hotfix: 1.1.4'te eklenen dinamik discovery `LoadRegistryAsync`'i `Task.Run` ile paralel çağırıyordu — `ReceiveLoopAsync` ile aynı WS üzerinde concurrent `ReceiveAsync` olmaz, result mesajları event filter'ına takılıp kayboluyordu. Çözüm: reload sırasında WS `CloseAsync` ile kapatılıyor, outer reconnect döngüsü temiz yeniden bağlanıp `LoadRegistryAsync`'i tek-reader olarak çalıştırıyor.

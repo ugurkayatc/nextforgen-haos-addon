@@ -1,29 +1,29 @@
-name: "NextForGen Agent (Canary)"
-description: "NextForGen akıllı ev platformu hub ajanı — KANARY KANAL. Bu eklenti sadece NextForGen iç test hub'larında çalışır. Yeni sürümler önce burada doğrulanır, sonra stable kanala yayılır. Müşteri hub'larına KURMAYIN."
-version: "1.1.5"
+﻿name: "NextForGen Agent (Canary)"
+description: "NextForGen akÄ±llÄ± ev platformu hub ajanÄ± â€” KANARY KANAL. Bu eklenti sadece NextForGen iÃ§ test hub'larÄ±nda Ã§alÄ±ÅŸÄ±r. Yeni sÃ¼rÃ¼mler Ã¶nce burada doÄŸrulanÄ±r, sonra stable kanala yayÄ±lÄ±r. MÃ¼ÅŸteri hub'larÄ±na KURMAYIN."
+version: "1.1.6"
 slug: "nextforgen_agent_canary"
 url: "https://nextforgen.com"
 arch:
   - aarch64
 init: false
 
-# HAOS API erişimleri
+# HAOS API eriÅŸimleri
 hassio_api: true
 homeassistant_api: true
 auth_api: false
 
-# Ağ yapılandırması
+# AÄŸ yapÄ±landÄ±rmasÄ±
 host_network: false
 ports:
   9100/tcp: 9100
 ports_description:
-  9100/tcp: "LAN fallback HTTPS endpoint (mobil lokal bağlantı)"
+  9100/tcp: "LAN fallback HTTPS endpoint (mobil lokal baÄŸlantÄ±)"
 
-# Kalıcı depolama
+# KalÄ±cÄ± depolama
 map:
   - addon_config:rw
 
-# Kullanıcı yapılandırma şeması
+# KullanÄ±cÄ± yapÄ±landÄ±rma ÅŸemasÄ±
 options:
   backend_url: "wss://api.nextforgen.com/hub"
   bootstrap_code: ""
@@ -36,13 +36,13 @@ schema:
   log_level: list(trace|debug|info|warning|error)
   dev_mode: bool
 
-# Docker image — canary kanal aynı GHCR image'ı kullanır.
-# Versiyon bump zincirleme: önce canary config.yaml + image push, 24h test, sonra stable config.yaml.
+# Docker image â€” canary kanal aynÄ± GHCR image'Ä± kullanÄ±r.
+# Versiyon bump zincirleme: Ã¶nce canary config.yaml + image push, 24h test, sonra stable config.yaml.
 image: "ghcr.io/ugurkayatc/agent"
 
-# Servis boot sonrası kendiliğinden başlasın
+# Servis boot sonrasÄ± kendiliÄŸinden baÅŸlasÄ±n
 startup: services
 boot: auto
 
-# Watchdog — agent crash'lerse yeniden başlat
+# Watchdog â€” agent crash'lerse yeniden baÅŸlat
 watchdog: "tcp://[HOST]:9100"
