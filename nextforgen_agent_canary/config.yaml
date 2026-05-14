@@ -1,6 +1,6 @@
 name: "NextForGen Agent (Canary)"
 description: "NextForGen akilli ev platformu hub ajani - KANARY KANAL. Bu eklenti sadece NextForGen ic test hub'larinda calisir. Yeni surumler once burada dogrulanir, sonra stable kanala yayilir. Musteri hub'larina KURMAYIN."
-version: "1.1.7"
+version: "1.1.8"
 slug: "nextforgen_agent_canary"
 url: "https://nextforgen.com"
 arch:
