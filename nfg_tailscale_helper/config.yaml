@@ -1,0 +1,45 @@
+name: "NFG Tailscale Helper"
+description: "NextForGen hub provisioning için Tailscale otomatik join (Plan K). authkey schema destekler — community addon'da yok."
+version: "1.0.0"
+slug: "nfg_tailscale_helper"
+url: "https://nextforgen.com"
+arch:
+  - aarch64
+  - amd64
+init: false
+
+# Tailscale için zorunlu kernel capabilities
+privileged:
+  - NET_ADMIN
+  - NET_RAW
+devices:
+  - /dev/net/tun
+
+host_network: true
+
+map:
+  - addon_config:rw
+
+options:
+  authkey: ""
+  hostname: ""
+  advertise_tags:
+    - "tag:nfg-provisioning"
+  accept_dns: true
+  accept_routes: true
+  log_level: "info"
+
+schema:
+  authkey: password?
+  hostname: str?
+  advertise_tags:
+    - "match(^tag:[a-z0-9-]+$)"
+  accept_dns: bool
+  accept_routes: bool
+  log_level: list(trace|debug|info|notice|warning|error|fatal)
+
+# Docker image (GitHub Container Registry) — arch suffix ile çözümlenir
+image: "ghcr.io/ugurkayatc/nfg-tailscale-helper-{arch}"
+
+startup: services
+boot: manual

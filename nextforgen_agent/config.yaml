@@ -1,6 +1,6 @@
 name: "NextForGen Agent"
 description: "NextForGen akıllı ev platformu hub bağlantı ajanı. Cihazlarınızı NextForGen uygulamasından yönetmenizi sağlar."
-version: "1.1.8"
+version: "1.1.15"
 slug: "nextforgen_agent"
 url: "https://nextforgen.com"
 arch:
@@ -10,10 +10,8 @@ init: false
 # HAOS API erişimleri
 hassio_api: true
 homeassistant_api: true
-auth_api: false
-
-# SUPERVISOR_TOKEN bu addon'a otomatik inject edilir
-# Agent bunu HA erişimi için kullanır
+# auth_api zorunlu — Supervisor /auth/reset + /auth/cache çağrıları için (Bölüm 9.7)
+auth_api: true
 
 # Ağ yapılandırması
 host_network: false
@@ -27,15 +25,23 @@ map:
   - addon_config:rw
 
 # Kullanıcı yapılandırma şeması
+# pairing_code + pre_shared_secret — teknisyen HAOS Configuration sekmesinden yapıştırır.
+# Finalize sonrası Agent kendisi temizler (ProvisioningPollService B3).
 options:
   backend_url: "wss://api.nextforgen.com/hub"
   bootstrap_code: ""
+  pairing_code: ""
+  pre_shared_secret: ""
+  nfg_tailscale_helper_slug: "f43b29bd_nfg_tailscale_helper"
   log_level: "info"
   dev_mode: false
 
 schema:
   backend_url: url
   bootstrap_code: str
+  pairing_code: str?
+  pre_shared_secret: password?
+  nfg_tailscale_helper_slug: str
   log_level: list(trace|debug|info|warning|error)
   dev_mode: bool
 
