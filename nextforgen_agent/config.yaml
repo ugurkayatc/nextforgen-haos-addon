@@ -1,32 +1,34 @@
-name: "NextForGen Agent"
-description: "NextForGen akıllı ev platformu hub bağlantı ajanı. Cihazlarınızı NextForGen uygulamasından yönetmenizi sağlar."
-version: "1.1.15"
+﻿name: "NextForGen Agent"
+description: "NextForGen akÄ±llÄ± ev platformu hub baÄŸlantÄ± ajanÄ±. CihazlarÄ±nÄ±zÄ± NextForGen uygulamasÄ±ndan yÃ¶netmenizi saÄŸlar."
+version: "1.1.16"
 slug: "nextforgen_agent"
 url: "https://nextforgen.com"
 arch:
   - aarch64
 init: false
 
-# HAOS API erişimleri
+# HAOS API eriÅŸimleri
 hassio_api: true
 homeassistant_api: true
-# auth_api zorunlu — Supervisor /auth/reset + /auth/cache çağrıları için (Bölüm 9.7)
+# auth_api zorunlu â€” Supervisor /auth/reset + /auth/cache Ã§aÄŸrÄ±larÄ± iÃ§in (BÃ¶lÃ¼m 9.7)
 auth_api: true
+# hassio_role: admin — /host/options ve /auth/reset endpoint'leri için zorunlu (Bölüm 9.7 finalize akışı).
+hassio_role: admin
 
-# Ağ yapılandırması
+# AÄŸ yapÄ±landÄ±rmasÄ±
 host_network: false
 ports:
   9100/tcp: 9100
 ports_description:
-  9100/tcp: "LAN fallback HTTPS endpoint (mobil lokal bağlantı)"
+  9100/tcp: "LAN fallback HTTPS endpoint (mobil lokal baÄŸlantÄ±)"
 
-# Kalıcı depolama
+# KalÄ±cÄ± depolama
 map:
   - addon_config:rw
 
-# Kullanıcı yapılandırma şeması
-# pairing_code + pre_shared_secret — teknisyen HAOS Configuration sekmesinden yapıştırır.
-# Finalize sonrası Agent kendisi temizler (ProvisioningPollService B3).
+# KullanÄ±cÄ± yapÄ±landÄ±rma ÅŸemasÄ±
+# pairing_code + pre_shared_secret â€” teknisyen HAOS Configuration sekmesinden yapÄ±ÅŸtÄ±rÄ±r.
+# Finalize sonrasÄ± Agent kendisi temizler (ProvisioningPollService B3).
 options:
   backend_url: "wss://api.nextforgen.com/hub"
   bootstrap_code: ""
@@ -48,9 +50,9 @@ schema:
 # Docker image (GitHub Container Registry)
 image: "ghcr.io/ugurkayatc/agent"
 
-# Servis boot sonrası kendiliğinden başlasın
+# Servis boot sonrasÄ± kendiliÄŸinden baÅŸlasÄ±n
 startup: services
 boot: auto
 
-# Watchdog — agent crash'lerse yeniden başlat
+# Watchdog â€” agent crash'lerse yeniden baÅŸlat
 watchdog: "tcp://[HOST]:9100"
