@@ -1,6 +1,6 @@
 ﻿name: "NextForGen Agent"
 description: "NextForGen akÄ±llÄ± ev platformu hub baÄŸlantÄ± ajanÄ±. CihazlarÄ±nÄ±zÄ± NextForGen uygulamasÄ±ndan yÃ¶netmenizi saÄŸlar."
-version: "1.1.19"
+version: "1.1.21"
 slug: "nextforgen_agent"
 url: "https://nextforgen.com"
 arch:
@@ -11,9 +11,13 @@ init: false
 hassio_api: true
 homeassistant_api: true
 # auth_api: v1.1.19 itibariyle aktif kullanılmıyor (HA admin reset akışı kaldırıldı).
+# İleride tekrar gerekirse SupervisorClient.ResetAuthPasswordAsync mevcut, sadece çağrılmıyor.
 auth_api: true
-# hassio_role: admin — /host/options için zorunlu (hostname swap, Bölüm 9.6 firstboot).
+# hassio_role: admin — /host/options için zorunlu (hostname swap, Bölüm 9.6 firstboot)
 hassio_role: admin
+
+# SUPERVISOR_TOKEN bu addon'a otomatik inject edilir
+# Agent bunu HA eriÅŸimi iÃ§in kullanÄ±r
 
 # AÄŸ yapÄ±landÄ±rmasÄ±
 host_network: false
@@ -25,10 +29,14 @@ ports_description:
 # KalÄ±cÄ± depolama
 map:
   - addon_config:rw
+  # /share — NFG Tailscale Helper ile paylaşılan volume.
+  # Helper /share/.nfg-auth-failed marker'ını yazar; Agent burada okur ve auth_failed raporlar.
+  - share:rw
 
 # KullanÄ±cÄ± yapÄ±landÄ±rma ÅŸemasÄ±
-# pairing_code + pre_shared_secret â€” teknisyen HAOS Configuration sekmesinden yapÄ±ÅŸtÄ±rÄ±r.
-# Finalize sonrasÄ± Agent kendisi temizler (ProvisioningPollService B3).
+# pairing_code + pre_shared_secret â€” BÃ¶lÃ¼m 9.2 form akÄ±ÅŸÄ± (teknisyen HAOS Configuration sekmesinden yapÄ±ÅŸtÄ±rÄ±r).
+# Yeni hub iÃ§in boÅŸ bÄ±rakÄ±lÄ±r; Agent finalize sonrasÄ± kendisi temizler (ProvisioningPollService B3).
+# Eski JSON akÄ±ÅŸÄ± (/config/.nfg-pairing.json) hÃ¢lÃ¢ destekli â€” varsa onu tercih eder.
 options:
   backend_url: "wss://api.nextforgen.com/hub"
   bootstrap_code: ""

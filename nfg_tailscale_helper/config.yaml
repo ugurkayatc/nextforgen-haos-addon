@@ -1,25 +1,23 @@
-﻿name: "NFG Tailscale Helper"
-description: "NextForGen hub provisioning iÃ§in Tailscale otomatik join (Plan K). authkey schema destekler â€” community addon'da yok."
-version: "1.0.1"
-slug: "nfg_tailscale_helper"
-url: "https://nextforgen.com"
+﻿name: NFG Tailscale Helper
+slug: nfg_tailscale_helper
+version: "1.0.3"
+description: NextForGen hub provisioning Tailscale apply (Plan K)
 arch:
   - aarch64
   - amd64
-init: false
-
-# Tailscale iÃ§in zorunlu kernel capabilities
+image: ghcr.io/ugurkayatc/nfg-tailscale-helper-{arch}
+url: https://github.com/UgurKayatc/AkilliEv
+host_network: true
 privileged:
   - NET_ADMIN
   - NET_RAW
 devices:
   - /dev/net/tun
-
-host_network: true
-
 map:
   - addon_config:rw
-
+  # /share — HAOS addon'lar arası paylaşılan volume.
+  # auth_failed marker (/share/.nfg-auth-failed) NFG Agent ile koordinasyon için kullanılır.
+  - share:rw
 options:
   authkey: ""
   hostname: ""
@@ -27,19 +25,14 @@ options:
     - "tag:nfg-provisioning"
   accept_dns: true
   accept_routes: true
-  log_level: "info"
-
+  log_level: info
 schema:
   authkey: password?
   hostname: str?
   advertise_tags:
-    - "match(^tag:[a-z0-9-]+$)"
+    - match(^tag:[a-z0-9-]+$)
   accept_dns: bool
   accept_routes: bool
   log_level: list(trace|debug|info|notice|warning|error|fatal)
-
-# Docker image (GitHub Container Registry) â€” arch suffix ile Ã§Ã¶zÃ¼mlenir
-image: "ghcr.io/ugurkayatc/nfg-tailscale-helper-{arch}"
-
 startup: services
-boot: manual
+boot: auto
