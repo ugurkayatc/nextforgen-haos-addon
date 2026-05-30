@@ -1,6 +1,6 @@
 ﻿name: "NextForGen Agent"
 description: "NextForGen akÄ±llÄ± ev platformu hub baÄŸlantÄ± ajanÄ±. CihazlarÄ±nÄ±zÄ± NextForGen uygulamasÄ±ndan yÃ¶netmenizi saÄŸlar."
-version: "1.1.25"
+version: "1.1.26"
 slug: "nextforgen_agent"
 url: "https://nextforgen.com"
 arch:
@@ -44,7 +44,6 @@ options:
   pre_shared_secret: ""
   nfg_tailscale_helper_slug: "f43b29bd_nfg_tailscale_helper"
   log_level: "info"
-  dev_mode: false
 
 schema:
   backend_url: url
@@ -53,7 +52,6 @@ schema:
   pre_shared_secret: password?
   nfg_tailscale_helper_slug: str
   log_level: list(trace|debug|info|warning|error)
-  dev_mode: bool
 
 # Docker image (GitHub Container Registry)
 image: "ghcr.io/ugurkayatc/agent"

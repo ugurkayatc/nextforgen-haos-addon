@@ -4,12 +4,12 @@
 BACKEND_URL=$(bashio::config 'backend_url')
 BOOTSTRAP_CODE=$(bashio::config 'bootstrap_code')
 LOG_LEVEL=$(bashio::config 'log_level')
-DEV_MODE=$(bashio::config 'dev_mode')
+# DevMode manifest schema'sından kaldırıldı (defense-in-depth) — bashio okumaz, export edilmez.
+# Program.cs runtime guard prod backend + DevMode=true durumunu zaten zorla kapatır.
 
 # Agent env değişkenlerine aktar
 export AGENT_Agent__BackendUrl="$BACKEND_URL"
 export AGENT_Agent__BootstrapCode="$BOOTSTRAP_CODE"
-export AGENT_Agent__DevMode="$DEV_MODE"
 export AGENT_Serilog__MinimumLevel__Default=$(echo "$LOG_LEVEL" | sed 's/\b\(.\)/\u\1/g')
 
 # HA URL — HAOS supervisor üzerinden

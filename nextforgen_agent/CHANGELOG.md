@@ -1,5 +1,13 @@
 ﻿# Changelog
 
+## 1.1.26
+
+- security(dev-mode): `dev_mode` kullanıcı option'ı + schema manifest'ten kaldırıldı (Configuration UI'dan açılamaz). Agent içinde runtime guard: prod backend + DevMode=true → zorla kapatılır (`NFG_ALLOW_DEV_MODE=true` ile local override). DevMode mTLS CA bypass + LAN auth bypass açtığı için defense-in-depth.
+- security(self-options): Agent self-options cleanup artık `dev_mode`'u Supervisor'a geri POST etmiyor; `run.sh` `dev_mode` okumuyor/export etmiyor.
+- fix(hub-offline): Hub offline iken komut sessiz başarı yerine açık hata döner.
+- fix(signalr): Cihaz state değişiminde duplicate push kaldırıldı.
+- Image değişmedi: `ghcr.io/ugurkayatc/agent` (tag 1.1.26). Manifest sync — kod monorepo (`ugurkayatc/NextForGen`) 1.1.26 ile eşitlendi.
+
 ## 1.1.5
 
 - Registry reload deadlock hotfix: 1.1.4'te eklenen dinamik discovery `LoadRegistryAsync`'i `Task.Run` ile paralel Ã§aÄŸÄ±rÄ±yordu â€” `ReceiveLoopAsync` ile aynÄ± WS Ã¼zerinde concurrent `ReceiveAsync` olmaz, result mesajlarÄ± event filter'Ä±na takÄ±lÄ±p kayboluyordu. Ã‡Ã¶zÃ¼m: reload sÄ±rasÄ±nda WS `CloseAsync` ile kapatÄ±lÄ±yor, outer reconnect dÃ¶ngÃ¼sÃ¼ temiz yeniden baÄŸlanÄ±p `LoadRegistryAsync`'i tek-reader olarak Ã§alÄ±ÅŸtÄ±rÄ±yor.
