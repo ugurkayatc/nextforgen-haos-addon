@@ -1,5 +1,11 @@
 ﻿# Changelog
 
+## 1.1.28 (2026-06-11)
+
+1.1.27 fix pivot — Azure exclusion path family `/h` geniş çıktı, `/heartbeat` de takıldı.
+
+- **fix(health-endpoint-pivot):** Canonical path artık `/api/agent/heartbeat` (önceki `/api/hub/heartbeat` Azure App Service `clientCertExclusionPaths` `/h` prefix family'sinde kalıp cert forward edilmeden 401 alıyordu — saha test sonucu doğruladı: `/heartbeat` de `/health` ile aynı kaderi paylaştı). `/api/agent/*` farklı path family olduğu için cert düzgün ulaşır. Backend `HubBootstrapController` 3 route dinler (agent/heartbeat canonical + hub/heartbeat + hub/health backward-compat ama Azure pratikte 401 döner).
+
 ## 1.1.27 (2026-06-11)
 
 Hub health POST endpoint path fix — sahada keşfedilen sessiz prod bug.
