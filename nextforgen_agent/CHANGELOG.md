@@ -1,5 +1,11 @@
 ﻿# Changelog
 
+## 1.1.29 (2026-06-11)
+
+1.1.28 pivot da yetmedi — Azure word-based exclusion saha testiyle kanıtlandı.
+
+- **fix(health-endpoint-word-pivot):** Azure App Service'in `clientCertExclusionPaths` ayarı path family değil **word-based** — path'in herhangi bir yerinde `health` veya `heartbeat` kelimesi geçtiği sürece cert forward edilmiyor (saha kanıtı: `/api/agent/anything` → 404 ama `/api/agent/heartbeat` → 401). Canonical path `/api/agent/telemetry`'e taşındı. Eski 3 route (hub/health, hub/heartbeat, agent/heartbeat) geçiş için tutuluyor ama Azure'da hâlâ 401.
+
 ## 1.1.28 (2026-06-11)
 
 1.1.27 fix pivot — Azure exclusion path family `/h` geniş çıktı, `/heartbeat` de takıldı.
