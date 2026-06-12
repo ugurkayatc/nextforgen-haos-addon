@@ -1,5 +1,11 @@
 ﻿# Changelog
 
+## 1.1.31 (2026-06-13)
+
+Saha hotfix — 1.1.30 sahada `HA state snapshot alınamadı; ... 404 (Not Found)` warning'i ile fallback registry-only çalışıyordu; yeni özellik etkili olmuyordu.
+
+- **fix(ha-rest-baseaddress):** `HaUrl="http://supervisor/core"` BaseAddress trailing slash içermediği ve `HaRestClient` rölatif URL'leri `/` ile başladığı için C# HttpClient kuralı gereği BaseAddress path bileşeni discard ediliyor, istek `http://supervisor/api/states`'e gidiyordu (Supervisor kendi API'ı, HA değil) → 404. Düzeltme: `Program.cs` BaseAddress sonuna `/` garanti, `HaRestClient` rölatif URL'leri leading slash'sız.
+
 ## 1.1.30 (2026-06-13)
 
 HA `/api/states` snapshot'ı `device.list` ile birlikte taşınır — mobile presentation overlay reconnect anında dolar.
