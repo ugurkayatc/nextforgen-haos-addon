@@ -1,5 +1,14 @@
 ﻿# Changelog
 
+## 1.1.30 (2026-06-13)
+
+HA `/api/states` snapshot'ı `device.list` ile birlikte taşınır — mobile presentation overlay reconnect anında dolar.
+
+- **feat(device.list-state-snapshot):** `BackendConnectionService.SendDeviceListAsync` HA REST üzerinden tüm entity state + attribute snapshot'ını çekip mesaja ekler. `DeviceEntityRegistry.GetAllDevices` her entity'nin canlı state + attribute'larını backend'e taşır.
+- **resilience:** HA REST erişilemezse fallback registry-only (eski davranış); iyi veri `unknown` ile ezilmez. Hata `LogWarning` ile raporlanır.
+
+**Saha etkisi:** Reconnect anında mobile light brightness slider, sensor LQI/RSSI ve friendly_name doğru gelir; ilk `state_changed` event'i beklemez. Backward-compat: eski backend yeni agent ile çalışır (snapshot field'ları ignored).
+
 ## 1.1.29 (2026-06-11)
 
 1.1.28 pivot da yetmedi — Azure word-based exclusion saha testiyle kanıtlandı.
