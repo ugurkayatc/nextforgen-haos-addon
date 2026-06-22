@@ -1,5 +1,14 @@
 ﻿# Changelog
 
+## 1.1.32 (2026-06-22)
+
+HA WebSocket (re)connect baseline seed + kullanıcı cihaz-ismi koruması (backend §13 ile birlikte, ana repo PR #51).
+
+- **feat(ha-ws-baseline-seed):** `HaWebSocketClient.ConnectAsync` her (re)connect'te `subscribe_events`'ten hemen sonra WS `get_states` çekip state baseline'ını seed eder (5s timeout, connect-generation guard'lı stale koruması, REST fallback). Kayıttan sonra hiç durum değiştirmeyen cihazların süresiz `unknown`/stale kalması sınıfı kapanır.
+- **Saha etkisi:** Sürekli açık kalan cihazlar (örn. Banyo/Giyinme) reconnect sonrası gerçek on/off baseline'ını alır; ilk `state_changed` event'ini beklemez.
+
+**Lockstep:** ana repo `NextForGen.Agent.csproj` + `nextforgen_agent/config.yaml/CHANGELOG.md` ile aynı sürüm. GHCR `ghcr.io/ugurkayatc/agent:1.1.32` imajı ana repo `agent-deploy.yml` ile basılır; bu manifest yalnız sürümü 1.1.32'ye yükseltir.
+
 ## 1.1.31 (2026-06-13)
 
 Saha hotfix — 1.1.30 sahada `HA state snapshot alınamadı; ... 404 (Not Found)` warning'i ile fallback registry-only çalışıyordu; yeni özellik etkili olmuyordu.
