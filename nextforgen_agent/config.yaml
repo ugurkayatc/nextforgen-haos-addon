@@ -1,6 +1,6 @@
 ﻿name: "NextForGen Agent"
 description: "NextForGen akÄ±llÄ± ev platformu hub baÄŸlantÄ± ajanÄ±. CihazlarÄ±nÄ±zÄ± NextForGen uygulamasÄ±ndan yÃ¶netmenizi saÄŸlar."
-version: "1.1.31"
+version: "1.1.34"
 slug: "nextforgen_agent"
 url: "https://nextforgen.com"
 arch:

@@ -1,5 +1,12 @@
 ﻿# Changelog
 
+## 1.1.34 (2026-06-28)
+
+Gerçek-zamanlı senkron (pain #2) agent tarafı — stable promotion (canary 1.1.34 ile aynı image/şema).
+
+- **feat(realtime-sync):** HA `state_changed` `last_updated` propagasyonu (C1) + registry-reload reconnect'te `get_states` gap-resync (C2, 30s debounce ile) + LAN snapshot `StateVersion` (C5). Backend §5 freshness + R9C1 connection-fencing ile birlikte çalışır.
+- **Lockstep:** GHCR `ghcr.io/ugurkayatc/agent:1.1.34` ana repo `agent-deploy.yml` ile basıldı. 1.1.33 atlandı (skip-get_states içeriyordu, 1.1.34 geri çevirir).
+
 ## 1.1.32 (2026-06-22)
 
 HA WebSocket (re)connect baseline seed + kullanıcı cihaz-ismi koruması (backend §13 ile birlikte, ana repo PR #51).
