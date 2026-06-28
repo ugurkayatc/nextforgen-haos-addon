@@ -64,7 +64,7 @@ P0 hardening (Codex review sonrası). Backend + Agent güvenlik/dayanıklılık 
 
 ## 1.1.25 (2026-05-29)
 
-LAN P0 foundation (Codex review PASS — Berk hub smoke testi merge öncesi son şart). Detay: PR #28.
+LAN P0 foundation (Codex review PASS — internal test hub smoke testi merge öncesi son şart). Detay: PR #28.
 
 - **feat(lan-snapshot):** Backend `device.snapshot.push` mesaj kontratı eklendi. Backend mobile-uyumlu `DeviceDto[]` snapshot'ını periyodik ve mutation-tetiklemeli Agent'a push eder; Agent NFG Guid ↔ HA `device_id` mapping cache'ler. Mobile `/local/v1/devices` LAN modunda artık tam DeviceModel-compatible response döner.
 - **feat(lan-ha-command):** `POST /local/v1/devices/{id}/ha-command` route eklendi. `HaLanCommandNormalizer` mobile cloud body shape'ini (`{command_id, target_entity, action, value:{...}}`) Agent `HaCommandTranslator`'ın beklediği flat shape'e çevirir — cloud `HaActionMapper` isim eşleştirmeleriyle birebir (`transition_seconds → transition`, `temperature_low/high → target_temp_low/high`). 8 E2E semantik testi geçiyor: select_option, set_brightness (+transition), set_temperature, set_temperature_range, set_position, lock+code, rgb_color array.
@@ -73,11 +73,11 @@ LAN P0 foundation (Codex review PASS — Berk hub smoke testi merge öncesi son 
 - **fix(lan-persistence) Codex P0 blocker:** `LanSnapshotStore` — backend'den gelen snapshot disk'e atomik yazılır (`/config/nextforgen-lan-snapshot.json`, tmp + `File.Move(overwrite)`). Hub restart / elektrik kesintisi sonrası backend bağlantısı kurulmadan önce LAN endpoint cached snapshot'ı serve eder. Corrupt JSON → warning + empty cache, Agent çökmez. Secret yok.
 - **fix(lan-race) Codex P0 blocker:** `DeviceEntityRegistry.UpdateSnapshot` immutable replace pattern — eski Clear()+fill window'u içinde okuyucular boş cache görüp 404 alabiliyordu. Şimdi `Volatile.Write` ile atomic dictionary swap. Test (parallel 4 reader × 500 iter) empty observation = 0 garanti ediyor.
 - **feat(lan-permissions):** `LanTokenClaims.Permissions` artık her endpoint'te enforce ediliyor — `device.read` GET/WS, `device.command` POST. Mevcut tokenlar her iki perm'i içerdiği için davranış bozulmaz; ileride read-only profil hazır.
-- **doc:** `docs/lan_p0_mobil_plan.md` MacBook için sıkı plan — LAN WS client, getDeviceById LAN dispatch, test listesi, P0 kabul kriterleri. `docs/lan_p0_berk_smoke.md` saha runbook.
+- **doc:** `docs/lan_p0_mobil_plan.md` MacBook için sıkı plan — LAN WS client, getDeviceById LAN dispatch, test listesi, P0 kabul kriterleri. `docs/lan_p0_smoke.md` saha runbook.
 
 **Geriye uyumluluk garantileri:** Eski Agent (v1.1.24) `device.snapshot.push`'u "default" switch dalında ignore eder — saha breaking yok. Eski mobile NFG Guid `/ha-command` çağrısı yeni Agent NFG resolve + normalize → çalışır. Eski mobile `/command` HA device_id ile `ResolveTargets` fallback dalı → çalışır.
 
-**Deploy Bağımlılığı:** Master image v1.0.5 build/upload/register, mobil sprint MacBook'ta uygulanıp Berk hub'da LAN acceptance PASS edilene kadar BEKLİYOR. **Bu sürüm prod'a deploy edilebilir** (eski mobile cloud modunda kalır; LAN modunda mobile WS subscribe etmediği için sadece komut yolu çalışır, state push sessizce gider).
+**Deploy Bağımlılığı:** Master image v1.0.5 build/upload/register, mobil sprint MacBook'ta uygulanıp internal test hub'da LAN acceptance PASS edilene kadar BEKLİYOR. **Bu sürüm prod'a deploy edilebilir** (eski mobile cloud modunda kalır; LAN modunda mobile WS subscribe etmediği için sadece komut yolu çalışır, state push sessizce gider).
 
 ## 1.1.24 (2026-05-24)
 
@@ -90,7 +90,7 @@ LAN P0 foundation (Codex review PASS — Berk hub smoke testi merge öncesi son 
 - **fix(lan-token) Bulgu P0-3**: `GetLanTokenQuery` artık boş/invalid fingerprint ile token üretmez. Format `sha256:[0-9a-f]{64}` regex doğrulaması ile kontrol edilir; başarısız ise HTTP **425 Too Early** döner ("LAN fingerprint henüz hazır değil; hub Agent'tan hello bekleniyor"). Eski davranış (boş secret ile token imzalama) tamamen kapatıldı.
 - **doc**: `docs/mobil_lan_fallback_fix.md` MacBook ekibine reçete — `.gitignore` exception eklendi, Codex koordinasyonu için artık GitHub'da. Credential YOK.
 
-**Deploy Bağımlılığı**: Master image v1.0.4 build/upload/register, mobil fix MacBook'ta uygulanıp Berk hub'da LAN acceptance PASS edilene kadar BEKLİYOR. Bu sürüm prod'a deploy edilebilir (mobil değişmeden de tek başına çalışır — sadece null-fingerprint guard'ları sayesinde mobil eski sürüm de cloud modunda kalır).
+**Deploy Bağımlılığı**: Master image v1.0.4 build/upload/register, mobil fix MacBook'ta uygulanıp internal test hub'da LAN acceptance PASS edilene kadar BEKLİYOR. Bu sürüm prod'a deploy edilebilir (mobil değişmeden de tek başına çalışır — sadece null-fingerprint guard'ları sayesinde mobil eski sürüm de cloud modunda kalır).
 
 ## 1.1.23 (2026-05-24)
 
@@ -102,7 +102,7 @@ LAN P0 foundation (Codex review PASS — Berk hub smoke testi merge öncesi son 
 
 ## 1.1.22 (2026-05-23)
 
-- **fix(reapply):** `HandleReapplyTailscaleAsync` helper options payload'una `log_level = "info"` eklendi. HAOS Supervisor `POST /addons/{slug}/options` PARTIAL update desteklemediği için helper schema'daki tüm mandatory alanlar dolu gönderilmek zorunda. log_level eksikliği nedeniyle Supervisor 400 dönüyordu (sahada Berk hub'da T4 acceptance test failure). Sansürleme çalıştı: 400 error body'sinde "authkey" geçtiği için log `[REDACTED:contains authkey-like substring]` ile maskelendi.
+- **fix(reapply):** `HandleReapplyTailscaleAsync` helper options payload'una `log_level = "info"` eklendi. HAOS Supervisor `POST /addons/{slug}/options` PARTIAL update desteklemediği için helper schema'daki tüm mandatory alanlar dolu gönderilmek zorunda. log_level eksikliği nedeniyle Supervisor 400 dönüyordu (sahada internal test hub'da T4 acceptance test failure). Sansürleme çalıştı: 400 error body'sinde "authkey" geçtiği için log `[REDACTED:contains authkey-like substring]` ile maskelendi.
 
 ## 1.1.21 (2026-05-23)
 
@@ -128,7 +128,7 @@ LAN P0 foundation (Codex review PASS — Berk hub smoke testi merge öncesi son 
 
 ## 1.1.18 (2026-05-18)
 
-- fix(run.sh): nfg_tailscale_helper_slug option okuma + AGENT_Agent__NfgTailscaleHelperSlug export. v1.1.17 ve öncesinde docker image run.sh bu field'i okumadığı için AgentOptions.NfgTailscaleHelperSlug runtime'da daima default değer kullanılıyordu — kullanıcı override (HAOS Configuration form'unda farklı slug) etkisiz idi. Default (f43b29bd_nfg_tailscale_helper) tesadüfen doğru olduğu için Berk hub'ta sorun çıkmadı, ama prensip olarak bug.
+- fix(run.sh): nfg_tailscale_helper_slug option okuma + AGENT_Agent__NfgTailscaleHelperSlug export. v1.1.17 ve öncesinde docker image run.sh bu field'i okumadığı için AgentOptions.NfgTailscaleHelperSlug runtime'da daima default değer kullanılıyordu — kullanıcı override (HAOS Configuration form'unda farklı slug) etkisiz idi. Default (f43b29bd_nfg_tailscale_helper) tesadüfen doğru olduğu için internal test hub'ta sorun çıkmadı, ama prensip olarak bug.
 
 ## 1.1.17 (2026-05-18)
 

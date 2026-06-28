@@ -24,7 +24,7 @@ Production-ready add-on installed on customer hubs.
 
 - Slug: `nextforgen_agent_canary`
 - Image: same `ghcr.io/ugurkayatc/agent`
-- Currently installed on: **Berk hub** (canary test)
+- Currently installed on: **internal NextForGen test hubs** (canary channel)
 
 ## Canary Release Workflow
 
