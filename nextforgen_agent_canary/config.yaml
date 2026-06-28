@@ -1,40 +1,50 @@
 name: "NextForGen Agent (Canary)"
-description: "NextForGen akilli ev platformu hub ajani - KANARY KANAL. Bu eklenti sadece NextForGen ic test hub'larinda calisir. Yeni surumler once burada dogrulanir, sonra stable kanala yayilir. Musteri hub'larina KURMAYIN."
-version: "1.1.8"
+description: "NextForGen Agent CANARY kanali — yeni surumler once buraya cikar, sahada dogrulandiktan sonra stable nextforgen_agent'a terfi eder. Yalnizca canary test hub'larina kurulur; ayni hub'da stable ile birlikte CALISTIRILMAZ (port 9100 cakismasi)."
+version: "1.1.34"
 slug: "nextforgen_agent_canary"
 url: "https://nextforgen.com"
 arch:
   - aarch64
 init: false
 
+# HAOS API erisimleri (stable ile ayni)
 hassio_api: true
 homeassistant_api: true
-auth_api: false
+auth_api: true
+hassio_role: admin
 
+# Ag yapilandirmasi
 host_network: false
 ports:
   9100/tcp: 9100
 ports_description:
-  9100/tcp: "LAN fallback HTTPS endpoint"
+  9100/tcp: "LAN fallback HTTPS endpoint (mobil lokal baglanti)"
 
+# Kalici depolama
 map:
   - addon_config:rw
+  - share:rw
 
+# Kullanici yapilandirma semasi (stable ile birebir ayni)
 options:
   backend_url: "wss://api.nextforgen.com/hub"
   bootstrap_code: ""
+  pairing_code: ""
+  pre_shared_secret: ""
+  nfg_tailscale_helper_slug: "f43b29bd_nfg_tailscale_helper"
   log_level: "info"
-  dev_mode: false
 
 schema:
   backend_url: url
   bootstrap_code: str
+  pairing_code: str?
+  pre_shared_secret: password?
+  nfg_tailscale_helper_slug: str
   log_level: list(trace|debug|info|warning|error)
-  dev_mode: bool
 
+# Stable ile AYNI GHCR image — canary yalnizca version tag'iyle ayrisir (:1.1.34).
 image: "ghcr.io/ugurkayatc/agent"
 
 startup: services
 boot: auto
-
 watchdog: "tcp://[HOST]:9100"
