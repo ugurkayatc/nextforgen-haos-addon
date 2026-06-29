@@ -1,5 +1,15 @@
 ﻿# Changelog
 
+## 1.1.35 (2026-06-29)
+
+P3-A (isim->HA propagasyonu) + G9 (gozlemlenebilirlik) — stable promotion (canary 1.1.35 ile ayni image/sema).
+Tamamen ADDITIVE; baglanti/heartbeat/state-flush yollarina DOKUNMAZ (1.1.32 offline-flap sinifi DEGIL).
+
+- **feat(P3-A device.rename):** App/teknisyen cihaz rename'i artik hub'in HA-UI adina da yansir
+  (backend `device.rename` -> agent `config/device_registry/update` name_by_user, fire-and-forget).
+- **feat(G9):** Eslenmemis HA entity drop'u distinct-entity-basina tek uyari ile loglanir (spam yok).
+- **Lockstep:** GHCR `ghcr.io/ugurkayatc/agent:1.1.35` ana repo agent-deploy.yml ile basildi.
+
 ## 1.1.34 (2026-06-28)
 
 Gerçek-zamanlı senkron (pain #2) agent tarafı — stable promotion (canary 1.1.34 ile aynı image/şema).

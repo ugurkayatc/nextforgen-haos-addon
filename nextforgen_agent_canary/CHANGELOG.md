@@ -3,6 +3,15 @@
 Canary kanali: yeni surumler once burada sahada dogrulanir, sonra stable `nextforgen_agent`'a
 ayni surum numarasiyla terfi eder. Stable her zaman canary'den <= surumdedir.
 
+## 1.1.35 (2026-06-29)
+
+P3-A (isim->HA propagasyonu) agent ayagi + G9 (gozlemlenebilirlik). Tamamen ADDITIVE;
+baglanti/heartbeat/state-flush yollarina DOKUNMAZ (1.1.32 offline-flap sinifi DEGIL).
+Berk hub'inda saha-dogrulamasi (tek hub, ayri canary buffer yok).
+
+- **feat(P3-A device.rename):** Backend `device.rename` -> agent HA `config/device_registry/update` name_by_user.
+- **feat(G9):** eslenmemis entity drop log (rate-limited, distinct entity basina tek).
+
 ## 1.1.34 (2026-06-25)
 
 Gercek-zamanli senkron P1 turu — agent ayagi (C1 + C2). Backend state-concurrency (C3, ayri tur,

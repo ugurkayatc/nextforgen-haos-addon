@@ -1,6 +1,6 @@
 name: "NextForGen Agent (Canary)"
 description: "NextForGen Agent CANARY kanali — yeni surumler once buraya cikar, sahada dogrulandiktan sonra stable nextforgen_agent'a terfi eder. Yalnizca canary test hub'larina kurulur; ayni hub'da stable ile birlikte CALISTIRILMAZ (port 9100 cakismasi)."
-version: "1.1.34"
+version: "1.1.35"
 slug: "nextforgen_agent_canary"
 url: "https://nextforgen.com"
 arch:
