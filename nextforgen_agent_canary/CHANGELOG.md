@@ -3,6 +3,26 @@
 Canary kanali: yeni surumler once burada sahada dogrulanir, sonra stable `nextforgen_agent`'a
 ayni surum numarasiyla terfi eder. Stable her zaman canary'den <= surumdedir.
 
+## 1.1.37 (2026-07-29)
+
+IntegrationHealthSupervisor (v2.1) agent ayagi — entegrasyon self-heal watchdog'u. Default KAPALI
+(canary-first): enable YALNIZ bu canary manifestindeki `integration_watchdog_enabled` option'indan
+gelir; stable `nextforgen_agent` manifestinde bu option YOKTUR -> jq default false -> stable'da ACILAMAZ.
+
+- **feat(IntegrationHealthSupervisor):** Sinif-A (setup_error -> entegrasyon reload) self-heal, izinli
+  domain'lerde (tuya, tapo); Sinif-B/B' (host onarimi, Tapo /24 UDP discovery ile IP kaymasi kurtarma)
+  yalniz tapo. Reload oncesi vendor-readiness gate (DNS + TCP connect + TLS handshake, allowlist);
+  backend-WS-reconnect tek basina gate ACMAZ, yalnizca "gate'i kontrol et" kenaridir.
+- **feat(kalici durum):** Supervisor circuit + pending repair transaction'i SQLite'ta (/data) tutar;
+  restart/update'te tekrar oynatilmaz (idempotent).
+- **feat(canary-only option, S4c):** `integration_watchdog_entity_recovery_timeout_sec` (default 20,
+  izinli 20..600) — repair sonrasi entity available bekleme penceresi. run.sh BOUNDED dogrular;
+  eksik/gecersiz/aralik-disi -> 20'ye FAIL-CLOSED. Option yoksa urun davranisi (20sn SLO) degismez.
+
+> Default kapali oldugundan sahaya inen image DAVRANIS DEGISTIRMEZ; watchdog yalniz canary test
+> hub'inda `integration_watchdog_enabled: true` ile acilir (Berk ILK canary OLMAZ). Canary
+> dogrulamasi (online + cihaz kontrol + self-heal gozlemi + offline-flap YOK) sonrasi degerlendirilir.
+
 ## 1.1.35 (2026-06-29)
 
 P3-A (isim->HA propagasyonu) agent ayagi + G9 (gozlemlenebilirlik). Tamamen ADDITIVE;
