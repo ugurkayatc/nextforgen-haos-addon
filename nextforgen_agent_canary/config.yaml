@@ -1,6 +1,6 @@
 name: "NextForGen Agent (Canary)"
 description: "NextForGen Agent CANARY kanali — yeni surumler once buraya cikar, sahada dogrulandiktan sonra stable nextforgen_agent'a terfi eder. Yalnizca canary test hub'larina kurulur; ayni hub'da stable ile birlikte CALISTIRILMAZ (port 9100 cakismasi)."
-version: "1.1.37"
+version: "1.1.38"
 slug: "nextforgen_agent_canary"
 url: "https://nextforgen.com"
 arch:
@@ -50,7 +50,7 @@ schema:
   integration_watchdog_enabled: bool
   integration_watchdog_entity_recovery_timeout_sec: int(20,600)
 
-# Stable ile AYNI GHCR image — canary yalnizca version tag'iyle ayrisir (:1.1.37).
+# Stable ile AYNI GHCR image — canary yalnizca version tag'iyle ayrisir (:1.1.38).
 image: "ghcr.io/ugurkayatc/agent"
 
 startup: services
