@@ -18,37 +18,32 @@ Production-ready add-on installed on customer hubs.
 - Image: `ghcr.io/ugurkayatc/agent` (linux/arm64)
 - Install on every customer hub. Enter the bootstrap code from technician panel and start.
 
-### NextForGen Agent (Canary)
+## Release Workflow
 
-**Internal use only.** This add-on is the canary release channel and must only be installed on NextForGen test hubs.
+NextForGen ships updates through a single **stable** channel. "Test before customers" happens on a dedicated stable **test hub** that is updated ahead of customer hubs:
 
-- Slug: `nextforgen_agent_canary`
-- Image: same `ghcr.io/ugurkayatc/agent`
-- Currently installed on: **internal NextForGen test hubs** (canary channel)
+1. **Develop & build** — bump `<Version>` in `NextForGen.Agent.csproj`, push to `main`. GitHub Actions (`agent-deploy.yml`) source-release build pushes `ghcr.io/ugurkayatc/agent:X.Y.Z` + `:latest` to GHCR (gated: csproj must equal the stable manifest version, CHANGELOG entry present, no-clobber).
+2. **Publish the manifest** — bump `nextforgen_agent/config.yaml` `version:` (+ a `CHANGELOG.md` entry) to the same version. This is a metadata-only change: CI only verifies the `:X.Y.Z` tag already exists in GHCR and pushes nothing.
+3. **Test hub first** — on the dedicated stable test hub (a non-customer hub), update the Agent add-on manually ("Güncelle"), or temporarily enable auto-update on that hub only. Soak for at least **24 hours**: no crash loops, backend log clean, device flow intact.
+4. **Roll out to customers** — customer hubs keep Agent `auto_update: false`, so they never auto-ship an untested build. After the test hub soaks clean, update each customer hub manually.
 
-## Canary Release Workflow
-
-NextForGen ships updates through a 2-stage rollout to avoid breaking customer hubs:
-
-1. **Develop & build** — version bump in `NextForGen.Agent.csproj`, push to `main`. GitHub Actions (`agent-deploy.yml`) auto-builds and pushes `ghcr.io/ugurkayatc/agent:X.Y.Z` + `:latest` to GHCR.
-2. **Canary** — bump `nextforgen_agent_canary/config.yaml` `version:` field, commit + push to `main`. Canary hubs auto-update within ~1 hour (HAOS Supervisor checks add-on updates hourly; provision script sets `auto_update: true` automatically).
-3. **Soak** — observe canary hubs for at least **24 hours**: no crash loops, backend log free of new errors, device flow intact.
-4. **Promote to stable** — bump `nextforgen_agent/config.yaml` `version:` to the same version, commit + push. All production hubs auto-update within ~1 hour.
-
-If the canary version misbehaves, **do not promote**. Fix and re-cycle through canary.
+If the version misbehaves on the test hub, **do not roll out**. Fix and re-cycle.
 
 ### Auto-update behavior
 
-Add-on auto-update is **enabled by default** for every hub installed via NextForGen provision script (`scripts/hub-provision/New-NfgHub.ps1`). After install, the script calls `POST /addons/{slug}` with `auto_update: true` for every add-on it installs (NextForGen Agent, Tailscale, Mosquitto, Z2M, Advanced SSH).
+The NextForGen provision script (`scripts/hub-provision/New-NfgHub.ps1`) sets auto-update **per add-on**:
 
-If auto-update is OFF on a hub (manual install, older script, etc.), enable it via:
+- **NextForGen Agent → `auto_update: false`** (forced on both fresh install and restore). A stable bump must never auto-ship to a customer hub before it is tested — the operator updates the Agent manually after the test hub soaks clean.
+- **Tailscale, Mosquitto, Z2M, Advanced SSH → `auto_update: true`** (unchanged).
 
-- HA UI → Settings → Add-ons → \<add-on\> → toggle "Auto update"
-- Or REST: `curl -X POST -H "Authorization: Bearer $SUPERVISOR_TOKEN" http://supervisor/addons/nextforgen_agent -d '{"auto_update":true}'`
+To update the Agent on a specific hub:
+
+- HA UI → Settings → Add-ons → NextForGen Agent → **Update** (or toggle "Auto update" on the test hub only)
+- Or REST: `curl -X POST -H "Authorization: Bearer $SUPERVISOR_TOKEN" http://supervisor/addons/nextforgen_agent/update`
 
 ## Image
 
-Both channels share the same multi-arch GHCR image. The slug separation provides install-side isolation; the channel choice happens at HAOS add-on store level by which add-on you install.
+The Agent add-on pulls the multi-arch GHCR image `ghcr.io/ugurkayatc/agent`. The manifest `version:` pins which published image tag a hub installs.
 
 ## Support
 
