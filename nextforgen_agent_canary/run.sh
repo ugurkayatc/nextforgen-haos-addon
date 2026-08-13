@@ -7,8 +7,9 @@ PRE_SHARED_SECRET=$(bashio::config 'pre_shared_secret')
 BOOTSTRAP_CODE=$(bashio::config 'bootstrap_code')
 NFG_TAILSCALE_HELPER_SLUG=$(bashio::config 'nfg_tailscale_helper_slug')
 LOG_LEVEL=$(bashio::config 'log_level')
-# DevMode manifest schema'sindan kaldirildi (defense-in-depth) — bashio okumaz, export edilmez.
-# Program.cs runtime guard prod backend + DevMode=true durumunu zaten zorla kapatir.
+# DevMode manifest schema'sindan kaldirildi (defense-in-depth) - bashio okumaz, export edilmez.
+# Program.cs guard'i fail-closed ve URL'den bagimsiz: DevMode yalnizca NFG_ALLOW_DEV_MODE=true
+# ile etkindir. Prod image bu degiskeni asla set etmez; DevMode sahada hicbir sekilde devreye giremez.
 
 # Agent env degiskenlerine aktar (Bolum 9.2 — Configuration form akisi)
 # PSS degeri loglanmaz; PairingCode masked log alir.
