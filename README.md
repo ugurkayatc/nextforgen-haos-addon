@@ -14,7 +14,7 @@ In HAOS Supervisor: **Settings → Add-ons → Add-on Store → menu → Reposit
 
 Production-ready add-on installed on customer hubs.
 
-- Slug: `nextforgen_agent`
+- Slug (manifest): `nextforgen_agent` — HA prefixes the **installed** slug with the repository hash on a hub (e.g. `f43b29bd_nextforgen_agent`); see [Auto-update behavior](#auto-update-behavior).
 - Image: `ghcr.io/ugurkayatc/agent` (linux/arm64)
 - Install on every customer hub. Enter the bootstrap code from technician panel and start.
 
@@ -38,8 +38,11 @@ The NextForGen provision script (`scripts/hub-provision/New-NfgHub.ps1`) sets au
 
 To update the Agent on a specific hub:
 
-- HA UI → Settings → Add-ons → NextForGen Agent → **Update** (or toggle "Auto update" on the test hub only)
-- Or REST: `curl -X POST -H "Authorization: Bearer $SUPERVISOR_TOKEN" http://supervisor/addons/nextforgen_agent/update`
+- HA UI → Settings → Add-ons → NextForGen Agent → **Update** (or toggle "Auto update" on the test hub only). This is the canonical path.
+- Or, from an add-on with Supervisor access, via REST (advanced). Use the **installed** slug, not the manifest slug `nextforgen_agent`: HA prefixes it with the repository hash, so on a hub added from this repo it is `f43b29bd_nextforgen_agent`. Confirm the actual slug first with `ha addons` (or `GET /addons`), then:
+
+      curl -X POST -H "Authorization: Bearer $SUPERVISOR_TOKEN" \
+           http://supervisor/addons/f43b29bd_nextforgen_agent/update
 
 ## Image
 
