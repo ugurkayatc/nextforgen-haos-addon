@@ -1,5 +1,24 @@
 ﻿# Changelog
 
+## 1.1.40 (2026-08-13)
+
+D4c write-stall gate — backend WS write-path sertlestirme. Yalniz backend WebSocket yazim yolu;
+HA upstream ve LAN downstream'e dokunmaz. Mesaj sema/icerik degismez, yeni paket eklenmez.
+
+- **fix(d4c-socket-write-gate):** Backend WS'e giden TUM yazimlar (system.hello / system.pong /
+  outbound / state buffer-flush / device.list) artik per-socket `SocketWriteGate` uzerinden
+  serilesir (`SemaphoreSlim(1,1)`). Her yazima kapi-bekleme + SendAsync TOPLAMI olarak
+  `WriteTimeoutSec` (varsayilan 30s) bir write-deadline uygulanir.
+- **fix(half-open-reap):** Yarim-acik soket / sessiz ag kaybinda `SendAsync` suresiz bloklaninca
+  deadline asimi soketi `Abort` edip `TimeoutException` firlatir -> reconnect dongusu yeni soketle
+  retry eder. Asili tek bir yazim tum outbound kuyrugunu artik suresiz bloklayamaz.
+- **safety(graceful-shutdown):** Servis/oturum iptali (caller cancellation) deadline DEGILDIR:
+  `OperationCanceledException` firlar, soket Abort EDILMEZ. Eski/yeni soket gate'leri bagimsizdir
+  (her ws kendi semaphore'unu tasir); receive (okuma) yolu gate'lenmez, ham soket uzerinde kalir.
+- **obs:** hello-write-start / hello-write-completed Information, write-deadline asimi Warning
+  loglanir. Bir yazimin tamamlanmasi "yerel write tamam" demektir — backend ACK'i DEGIL.
+- **Lockstep:** GHCR `ghcr.io/ugurkayatc/agent:1.1.40` ana repo agent-deploy.yml ile basildi; bu manifest yalniz surumu 1.1.40'a yukseltir.
+
 ## 1.1.35 (2026-06-29)
 
 P3-A (isim->HA propagasyonu) + G9 (gozlemlenebilirlik) — stable promotion (canary 1.1.35 ile ayni image/sema).
