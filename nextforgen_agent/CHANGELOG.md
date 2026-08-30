@@ -1,5 +1,22 @@
 ﻿# Changelog
 
+## 1.1.41 (2026-08-30)
+
+Kilit "Kapiyi ac" (lock.open) kontrat destegi. Tamamen ADDITIVE; baglanti/heartbeat/state-flush
+yollarina DOKUNMAZ (1.1.32 offline-flap sinifi DEGIL). Agent'in derlenmis paylasimli komut
+resolver'i (HaCommandContract / HaCommandResolver) 1.1.40'ta lock domaininde yalniz lock/unlock
+tanidigi icin, backend'den gelen {action:"open"} komutunu fail-closed reddediyordu; bu surum
+`open` fiilini ekler.
+
+- **feat(lock-open):** lock domeni komut tablosu artik `open` fiilini icerir -> HA `lock.open`
+  servis cagrisi (momentary latch; opsiyonel `code`). Bilinmeyen fiil HALA fail-closed reddedilir
+  (C2 komut allowlist korunur).
+- **scope:** Yalniz Ha komut cevirisi (HaCommandTranslator). Presentation/state okuma, LAN
+  downstream ve reconnect mantigi degismez; yeni paket/sema eklenmez.
+- **Manifest:** csproj `<Version>` 1.1.41 + ana repo `nextforgen_agent/config.yaml` 1.1.41.
+  GHCR image push (ghcr.io/ugurkayatc/agent:1.1.41) + public add-on repo manifest sync AYRI
+  publish adimidir.
+
 ## 1.1.40 (2026-08-13)
 
 D4c write-stall gate — backend WS write-path sertlestirme. Yalniz backend WebSocket yazim yolu;
