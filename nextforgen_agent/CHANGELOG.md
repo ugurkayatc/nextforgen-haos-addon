@@ -1,5 +1,27 @@
 ﻿# Changelog
 
+## 1.1.42 (2026-08-30)
+
+Hayalet-entity self-heal'in agent yarisi (backend yarisi ayri surumde canli). device.list
+payload'i artik otoriter uyelik bayragi tasir; backend bunu gorunce ReportedState'ten HA
+registry'de artik bulunmayan (rename / re-pair / slug-collision ile geride kalan) entity'leri
+budayabilir. Tamamen ADDITIVE + geriye uyumlu: eski backend bayragi yok sayar. Baglanti /
+heartbeat / state-flush yollarina DOKUNMAZ.
+
+- **feat(entities-authoritative):** `BackendConnectionService.SendDeviceListAsync` device.list
+  mesajina `entitiesAuthoritative: true` ekler. device.list her zaman tam `OnRegistryLoaded`
+  snapshot'indan kuruldugu icin kosulsuz otoriter isaretlenir. Backend yalniz bu bayrak VE en
+  az bir gecerli entity_id varsa prune eder.
+- **fix(atomic-registry-view):** `DeviceEntityRegistry` uc eslemesi (device->entity,
+  entity->device, device-entities) tek immutable `RegistryView` altinda toplanir ve
+  `Volatile.Write` ile atomik degistirilir. Okuyucu her zaman "tam eski VEYA tam yeni" gorur;
+  eski Clear()+doldur penceresindeki kismi/torn okuma kalkar -> backend'e eksik uyelik gitmez
+  -> otoriter prune gercek entity'leri asla silmez.
+- **scope:** Yalniz agent registry gorunumu + device.list payload bayragi. LAN snapshot
+  eslemesi, komut cevirisi, presentation ve reconnect mantigi degismez; yeni paket/sema yok.
+- **Manifest:** csproj `<Version>` 1.1.42 + `nextforgen_agent/config.yaml` 1.1.42. GHCR image
+  push (ghcr.io/ugurkayatc/agent:1.1.42) + public add-on repo manifest sync AYRI publish adimidir.
+
 ## 1.1.41 (2026-08-30)
 
 Kilit "Kapiyi ac" (lock.open) kontrat destegi. Tamamen ADDITIVE; baglanti/heartbeat/state-flush
