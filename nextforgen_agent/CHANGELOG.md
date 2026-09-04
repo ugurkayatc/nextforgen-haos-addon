@@ -1,5 +1,39 @@
 ﻿# Changelog
 
+## 1.1.43 (2026-09-04)
+
+app->HA rename propagation (Faz 2A / P2) agent yarisi (backend yarisi ayni degisiklik setinde).
+HA'da kullanicinin GORDUGU etkin ad device.list'e tasinir ve app rename'i icin attempt-aware
+makbuz (device.rename.result) uretilir; boylece backend nihai "Synced" teyidini sonraki
+device.list'te DisplayName==PlatformName ile verebilir. Tamamen ADDITIVE + geriye uyumlu. Backend
+WS baglanti / heartbeat / state-flush yollarina DOKUNMAZ (1.1.32 offline-flap sinifi DEGIL); yeni
+paket/sema yok.
+
+- **feat(effective-name):** `DeviceEntityRegistry` device.list projeksiyonu artik
+  `name_by_user ?? name ?? id` tasir (`HaDeviceInfo.NameByUser` yeni trailing-optional alan,
+  `config/device_registry/list` `name_by_user`'dan okunur). Kullanici HA'da cihazi yeniden
+  adlandirinca ad `name_by_user`'a yazilir; device.list bunu tasidigi icin backend `PlatformName`
+  kullanicinin gordugu ada yakinsar -> otoriter "Synced" ulasilabilir olur. `name_by_user` null
+  ise HA friendly adi (`name`) kullanilir (geriye uyumlu; pozisyonel construction / JSON
+  deserialize kirilmaz).
+- **feat(rename-receipt):** `device.rename` payload'i artik `deviceId` + `attemptToken` tasir.
+  Agent HA'ya `name_by_user` yazip sonucu `device.rename.result` makbuzu ({deviceId, haDeviceId,
+  ok, error, attemptToken}) olarak bildirir ve `attemptToken`'i AYNEN geri yankilar. Backend
+  makbuzu yalniz cihazin GUNCEL token'iyla eslesirse uygular -> eski/yaris makbuzlari no-op
+  (attempt-aware idempotans). HA tek-okuyucu modeli geregi `ok=true` = "WS frame gonderildi", "HA
+  uyguladi" DEGIL; nihai Synced device.list'ten gelir. HA yazimi try/catch: gercek iptal (OCE)
+  disari verilir, diger hata `ok=false` + hata metni (reconnect'te yeniden denenir).
+- **fix(ha-ws-send-serialization):** `HaWebSocketClient` paylasilan HA upstream soketine giden TUM
+  sender'lar (auth / subscribe / get_states / registry / `RenameDeviceAsync`) tek `SendAsync`
+  frame-yazimini `_sendLock` (`SemaphoreSlim(1,1)`) ile serilestirir -> eszamanli
+  `ClientWebSocket.SendAsync` -> `InvalidOperationException` onlenir. Serialize/encode kilit
+  DISINDA; yalniz gercek frame yazimi kilitlenir; receive (okuma) yolu gate'lenmez.
+- **scope:** Yalniz agent HA okuma projeksiyonu + rename dispatch/receipt echo + HA upstream send
+  serilestirme. Backend WS write-path (1.1.40 SocketWriteGate), LAN downstream, komut cevirisi ve
+  reconnect mantigi degismez.
+- **Manifest:** csproj `<Version>` 1.1.43 + `nextforgen_agent/config.yaml` 1.1.43. GHCR image
+  push (ghcr.io/ugurkayatc/agent:1.1.43) + public add-on repo manifest sync AYRI publish adimidir.
+
 ## 1.1.42 (2026-08-30)
 
 Hayalet-entity self-heal'in agent yarisi (backend yarisi ayri surumde canli). device.list
