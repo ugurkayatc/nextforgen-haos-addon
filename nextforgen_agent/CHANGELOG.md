@@ -1,5 +1,25 @@
 ﻿# Changelog
 
+## 1.1.44 (2026-09-04)
+
+P4A ikon sadakati LAN yarisi: agent LAN device snapshot modeli artik kullanicinin manuel
+sectigi ikonu (userIconKey) tasir. Boylece cihaz manuel ikonu LAN-fallback fetch'inde
+(/local/v1/devices) korunur; backend snapshot push alani gonderdiginde agent onu DUSURMEZ.
+Tamamen ADDITIVE + geriye uyumlu; yeni paket/sema yok, komut cevirisi / reconnect / WS
+write-path degismez (1.1.32 offline-flap sinifi DEGIL).
+
+- **feat(lan-usericonkey):** `LanDeviceSnapshot` modeline `[JsonPropertyName("userIconKey")]
+  string? UserIconKey` eklendi (trailing-optional). Backend `device.snapshot.push` payload'i
+  camelCase `userIconKey` tasir; agent tipli deserialize'da alan artik korunur ve
+  `LocalEndpointService` uzerinden aynen geri servis edilir. Alan absent/null ise manuel ikon
+  yok (Otomatik) demektir -> uydurma deger uretilmez (otoriter-null).
+- **scope:** Yalniz LAN snapshot modeli alan tasima. Backend LAN push projeksiyonu ve mobil
+  persist/render ayni P4A commit'inde (227ac0d). HA okuma, komut cevirisi, rename dispatch
+  DOKUNULMAZ.
+- **Manifest:** csproj `<Version>` 1.1.44 + `nextforgen_agent/config.yaml` 1.1.44. GHCR image
+  push (ghcr.io/ugurkayatc/agent:1.1.44) + public add-on repo (`ugurkayatc/nextforgen-haos-addon`)
+  manifest 1.1.44 sync AYRI publish adimidir.
+
 ## 1.1.43 (2026-09-04)
 
 app->HA rename propagation (Faz 2A / P2) agent yarisi (backend yarisi ayni degisiklik setinde).
