@@ -1,6 +1,6 @@
 ﻿name: "NextForGen Agent"
 description: "NextForGen akÄ±llÄ± ev platformu hub baÄŸlantÄ± ajanÄ±. CihazlarÄ±nÄ±zÄ± NextForGen uygulamasÄ±ndan yÃ¶netmenizi saÄŸlar."
-version: "1.1.44"
+version: "1.1.45"
 slug: "nextforgen_agent"
 url: "https://nextforgen.com"
 arch:
@@ -44,6 +44,8 @@ options:
   pre_shared_secret: ""
   nfg_tailscale_helper_slug: "f43b29bd_nfg_tailscale_helper"
   log_level: "info"
+  # IntegrationHealthSupervisor — hub başına açılır (teknisyen). Default KAPALI.
+  integration_watchdog_enabled: false
 
 schema:
   backend_url: url
@@ -52,6 +54,9 @@ schema:
   pre_shared_secret: password?
   nfg_tailscale_helper_slug: str
   log_level: list(trace|debug|info|warning|error)
+  integration_watchdog_enabled: bool?
+  # Opsiyonel S4c penceresi; set edilmezse run.sh 20sn (ürün SLO) kullanır.
+  integration_watchdog_entity_recovery_timeout_sec: "int(20,600)?"
 
 # Docker image (GitHub Container Registry)
 image: "ghcr.io/ugurkayatc/agent"

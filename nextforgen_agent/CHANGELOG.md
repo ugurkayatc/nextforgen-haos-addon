@@ -1,5 +1,20 @@
 ﻿# Changelog
 
+## 1.1.45 (2026-09-29)
+
+IntegrationHealthSupervisor add-on option'i: tek-stable modelde canary manifesti kaldirildigi
+icin watchdog'u acmanin tek yolu stable manifest option'idir. Default KAPALI; davranis
+degismez (option false/eksik -> supervisor calismaz).
+
+- **feat(manifest):** `integration_watchdog_enabled` (bool?, default `false`) ve opsiyonel
+  `integration_watchdog_entity_recovery_timeout_sec` (`int(20,600)?`, default yok -> run.sh 20sn)
+  add-on semasina eklendi. Hub basina teknisyen HAOS Configuration sekmesinden acar.
+- **chore:** run.sh / AgentOptions / Program.cs icindeki "canary" yorumlari tek-stable modele
+  guncellendi. Kod davranisi degismez (yalniz yorum + surum).
+- **Manifest:** csproj `<Version>` 1.1.45 + `nextforgen_agent/config.yaml` 1.1.45. Public add-on
+  repo (`ugurkayatc/nextforgen-haos-addon`) manifest'i YALNIZ GHCR `:1.1.45` dogrulandiktan sonra
+  guncellenir (ayri onay).
+
 ## 1.1.44 (2026-09-04)
 
 P4A ikon sadakati LAN yarisi: agent LAN device snapshot modeli artik kullanicinin manuel
