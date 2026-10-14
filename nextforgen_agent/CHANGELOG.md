@@ -1,5 +1,24 @@
 ﻿# Changelog
 
+## 1.1.46 (2026-10-14)
+
+Olcum P2 (hub reconnect offline yarisi): agent, her backend WS oturumu icin oturumun ILK bitis
+nedenini tek yapilandirilmis satirla loglar. Backend `Hub oturumu bitti` (P1, canli) satiriyla UTC
+zamanla eslenir; kopmanin agent / on katman (ARR) / ag tarafinda mi basladigini ayirmak icindir.
+Yalniz teshis: reconnect, backoff, heartbeat ve yazim akisi DEGISMEZ.
+
+- **feat(telemetry):** `BackendSessionEndRecorder` ilk-yazan-kazanir. Nedenler: CloseFrame,
+  ReceiveException, LoopException, LoopEnded, WriteDeadline, ReconnectRequested, ServiceStopping,
+  SetupFailed. Satir: `Backend oturumu bitti. Reason=..., FirstCompleted=...` + omur, son inbound'dan
+  beri gecen sure, close kodu, hata tip adi ve guvenli hata kodlari. Payload, close aciklama metni,
+  exception mesaji, token, cert ve IP LOGLANMAZ. Seviye: ServiceStopping/ReconnectRequested
+  Information, digerleri Warning.
+- **feat(write-gate):** `SocketWriteGate` deadline asiminda soketi Abort etmeden ONCE kayda haber
+  verir. Boylece neden, Abort'un tetikledigi receive hatasi degil WriteDeadline olarak gorunur.
+- **Manifest:** csproj `<Version>` 1.1.46 + `nextforgen_agent/config.yaml` 1.1.46. Public add-on
+  repo (`ugurkayatc/nextforgen-haos-addon`) manifest'i YALNIZ GHCR `:1.1.46` dogrulandiktan sonra
+  guncellenir.
+
 ## 1.1.45 (2026-09-29)
 
 IntegrationHealthSupervisor add-on option'i: tek-stable modelde canary manifesti kaldirildigi
