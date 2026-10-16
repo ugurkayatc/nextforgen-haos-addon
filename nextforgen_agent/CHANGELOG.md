@@ -1,5 +1,29 @@
 ﻿# Changelog
 
+## 1.1.48 (2026-10-16)
+
+LAN token guvenligi (PR-0): eski LAN token imza anahtari mDNS'te yayinlanan fingerprint'ten
+turetiliyordu; ayni Wi-Fi'daki herkes gecerli token uretebiliyordu. Agent artik YALNIZ backend'in
+mTLS kanaliyla ittigi ES256 public key'leriyle dogrular.
+
+- **feat(lan):** `LanTokenValidator` yalniz ES256 kabul eder; fingerprint-turevli HS256 hicbir
+  kosulda kabul edilmez (cift-format / rollback yok). Anahtar yoksa hicbir token gecmez (fail-closed).
+- **feat(lan-trust):** `lan.trust.sync` -> `LanTrustStore` (`/data/agent/lan-trust.json`, atomik
+  yazim) -> `lan.trust.ack` (correlationId = sync id). Ack YALNIZ kalici yazimdan sonra; gecersiz
+  girdi / disk hatasi -> ack yok, backend bekleyen iptali yeniden baglantida tekrar iter. Restart
+  sonrasi anahtar ve iptaller diskten yuklenir. Dosyada secret yok (public key + iptal kaydi).
+- **feat(lan-ws):** acik `/local/v1/states` baglantilari token suresi dolunca 1008 `token_expired`,
+  iptal / anahtar degisiminde 1008 `token_revoked` ile kapanir; istemci 5 sn icinde kapanisi
+  tamamlamazsa baglanti dusurulur. Her yayindan once yetki yeniden kontrol edilir.
+- **feat(lan-panel):** `pk=panel` token'i yalniz snapshot'taki (backend gorunur listesi) NFG Guid
+  cihazlarini okur / komutlar / state alir; HA device_id fallback'i yok.
+- **Guest:** yalniz `device.read` (komut 403).
+- **Rollout sirasi (ZORUNLU):** backend imza anahtarlari yapilandirilip PR-0b backend'i CANLIYA
+  alinmadan bu surum yayinlanmaz; aksi halde hub anahtarsiz kalir ve LAN fallback tamamen kapanir.
+- **Manifest:** csproj `<Version>` 1.1.48 + `nextforgen_agent/config.yaml` 1.1.48. Public add-on
+  repo (`ugurkayatc/nextforgen-haos-addon`) manifest'i YALNIZ GHCR `:1.1.48` dogrulandiktan sonra
+  guncellenir.
+
 ## 1.1.47 (2026-10-14)
 
 Graceful stop: servis kapanirken (ServiceStopping) agent backend'e WebSocket NormalClosure close
