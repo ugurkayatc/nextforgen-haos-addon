@@ -1,5 +1,28 @@
 ﻿# Changelog
 
+## 1.1.47 (2026-10-14)
+
+Graceful stop: servis kapanirken (ServiceStopping) agent backend'e WebSocket NormalClosure close
+frame'i yazar. Backend oturumu premature-close (ReceiveException / ConnectionClosedPrematurely)
+yerine `Reason=CloseFrame, CloseStatus=1000` olarak kaydeder. Boylece restart/update kaynakli
+kapanislar gercek kopmalardan ayrilir.
+
+- **fix(connection):** Kok neden: bekleyen `ReceiveAsync`, servis token'ina bagli oturum token'iyla
+  calisiyordu. Stop'ta iptal, ManagedWebSocket'i Abort ediyor ve close frame hic yazilmiyordu.
+  Receive artik yalniz oturum token'ini dinler. Heartbeat, send ve mesaj yonlendirme servis+oturum
+  token'ini dinlemeye devam eder. Stop sonrasi receive hatasi (ucustaki yazimin iptalde soketi Abort
+  etmesi) ilk nedenin yerine yazilmaz; kayit ServiceStopping olarak kalir.
+- **fix(write-gate):** `SocketWriteGate.CloseOnShutdownAsync` yazim kilidini alir, yani ucustaki
+  bir `SendAsync` ile eszamanli yazmaz. Soket Open/CloseReceived ise `CloseOutputAsync(NormalClosure)`
+  yazar ve receive dongusunun bitmesini bekler. Toplam butce 2 sn'dir. Butce asilirsa (asili kapi,
+  yarim-acik soket) soket Abort edilir; kapanis asla bloklanmaz.
+- **Kapsam:** Yalniz ilk neden ServiceStopping ise calisir. Reconnect, WriteDeadline, receive/loop
+  hatasi ve setup yollari DEGISMEZ. Oturum-sonu kaydi ilk nedeni (ServiceStopping) korur.
+- **Bilinen sinir:** Stop aninda ucusta olan bir yazim, iptalde soketi zaten Abort eder; o durumda
+  close atlanir (onceki davranis). Hello/flush/device.list kurulum asamasindaki stop kapsam disidir.
+- **Manifest:** csproj `<Version>` + `<InformationalVersion>` 1.1.47 + `nextforgen_agent/config.yaml`
+  1.1.47. Public add-on repo manifest'i YALNIZ GHCR `:1.1.47` dogrulandiktan sonra guncellenir.
+
 ## 1.1.46 (2026-10-14)
 
 Olcum P2 (hub reconnect offline yarisi): agent, her backend WS oturumu icin oturumun ILK bitis
