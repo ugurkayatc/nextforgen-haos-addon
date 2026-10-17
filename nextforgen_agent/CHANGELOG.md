@@ -1,5 +1,25 @@
 ﻿# Changelog
 
+## 1.1.49 (2026-10-16)
+
+Backend baglantisi asili kalmaz: bir oturum `ReceiveException` ile bittikten sonra
+`ClientWebSocket.ConnectAsync` timeout'suz oldugu icin upgrade yaniti gelmeyen yarim-acik yolda
+saatlerce bekleyebiliyordu (2026-10-16 saha: ~7 saat; retry dongusu hic donmedi, hub offline
+gorundu). Mesaj kontrati degismez.
+
+- **fix(connect):** backend WS baglantisi (TCP + TLS + HTTP upgrade toplami) `ConnectTimeoutSec`
+  (varsayilan 30 sn) ile sinirli. Asimda `TimeoutException` -> mevcut backoff/retry dongusu.
+  Servis durdurma iptali eskisi gibi `OperationCanceledException` olarak yayilir.
+- **fix(tcp-liveness):** backend soketi kendi `SocketsHttpHandler` + `ConnectCallback` ile acilir:
+  TCP keepalive (bosta 60 sn, 15 sn arayla prob) + Linux'ta `TCP_USER_TIMEOUT` 120 sn (Linux'ta
+  kesme karari prob sayisi yerine bundan gelir). Ayarlar TCP baglantisi kurulduktan SONRA uygulanir
+  (Unix'te connect oncesi raw socket option, DNS coklu-adres connect'i reddediyor).
+  Yarim-acik oturumda cekirdek baglantiyi ~2 dk icinde dusurur (onceden tcp_retries2 ~15 dk;
+  bosta receive icin sinirsiz) -> receive hatasi -> reconnect. Ayar uygulanamazsa uyari loglanir,
+  baglanti yine kurulur. mTLS client cert ve DevMode CA bypass handler'in `SslOptions`'una tasindi.
+- **Manifest:** csproj `<Version>`/`<InformationalVersion>` 1.1.49 + `nextforgen_agent/config.yaml`
+  1.1.49.
+
 ## 1.1.48 (2026-10-16)
 
 LAN token guvenligi (PR-0): eski LAN token imza anahtari mDNS'te yayinlanan fingerprint'ten
