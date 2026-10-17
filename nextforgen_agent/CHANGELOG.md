@@ -1,5 +1,25 @@
 ﻿# Changelog
 
+## 1.1.50 (2026-10-17)
+
+HA kumanda yuzeyi (`ha.control.v1`, D1-A/D1-B): teknisyenin yayinladigi kumanda tanimlari
+(TV kumandasi, SmartIR klima) hub'da kalici tutulur ve musteri yalniz bu tanimlardaki
+dugmeleri tetikleyebilir. Mevcut mesaj kontratlari degismez; yeni yetenek `system.hello`
+icinde `ha.control.v1` olarak ilan edilir (eski backend icin etkisiz).
+
+- **feat(control):** `ControlDefinitionStore` kalici tanim deposu (atomik yazim, monoton
+  revizyon, bozuk dosyada fail-closed). Backend `control.definitions.push` -> ack (applied/stale).
+- **feat(control):** `ControlFacade` cloud ve LAN icin tek yetkili cagri yolu: hedef entity ve
+  servis her zaman yayinlanmis tanimdan gelir, istemci yalniz controlId/slotId + deger gonderir;
+  sabit domain/servis allowlist'i, kullanici basina commandId tekillestirme, panel ve salt-okunur
+  kimlikler reddedilir.
+- **feat(control):** `HaEntityCatalog` cihazsiz entity'ler dahil canli katalog
+  (`control.catalog.get`) ve yayinlanmis entity'ler icin `control.state.get` /
+  `control.state_changed` (yalniz izinli attribute'lar).
+- **feat(lan):** LAN kumanda cagri rotasi istek boyutu sinirli; ayni facade'i kullanir.
+- **Manifest:** csproj `<Version>`/`<InformationalVersion>` 1.1.50 + `nextforgen_agent/config.yaml`
+  1.1.50.
+
 ## 1.1.49 (2026-10-16)
 
 Backend baglantisi asili kalmaz: bir oturum `ReceiveException` ile bittikten sonra
