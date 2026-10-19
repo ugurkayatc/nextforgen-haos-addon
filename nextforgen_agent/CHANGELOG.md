@@ -1,5 +1,26 @@
 ﻿# Changelog
 
+## 1.1.51 (2026-10-18)
+
+Kalici durum add-on restart/update'inde kaybolmaz. Kok neden: agent imajindaki
+`VOLUME ["/data/agent"]`, Supervisor'in bagladigi `/data`'nin ALTINA anonim Docker volume'u aciyordu;
+Supervisor add-on'u durdururken/baslatirken container'i silip yeniden yarattigi icin bu volume'daki
+durum (kumanda tanimlari `controls.json`, `lan-trust.json`, `lan_cert.pfx`,
+`integration_supervisor.db`, loglar) her restart'ta kayboluyordu. Mesaj kontrati ve yollar degismez.
+
+- **fix(persist):** Dockerfile'dan `VOLUME ["/data/agent"]` kaldirildi; `/data/agent` artik
+  Supervisor'in add-on icin kalici bagladigi `/data` icinde (manifest `map` degisikligi gerekmez).
+  Eski anonim volume'daki veri yeni container'a tasinamaz (volume container ile birlikte silinmisti);
+  1.1.50 sahada kumanda tanimi yayinlanmadigi icin tasinacak kumanda verisi yok; LAN trust anahtarlari (varsa) backend senkronuyla
+  yeniden gelir (bu surumde dogrulanmadi, saha kontrol listesinde).
+- **feat(run.sh):** `/data/agent` ayri bir mount ise (ornegin VOLUME geri sizarsa) acilista
+  UYARI loglanir; acilis engellenmez.
+- **test:** `AgentPersistentPathsContractTests` — Dockerfile'da VOLUME yok, tum varsayilan/sabit
+  yollar kalici kokte, gercek varsayilan yollarla gercek store'larin "container yeniden yaratildi"
+  simulasyonunda durumu korudugu, run.sh mount uyarisi.
+- **Manifest:** csproj `<Version>`/`<InformationalVersion>` 1.1.51 + `nextforgen_agent/config.yaml`
+  1.1.51.
+
 ## 1.1.50 (2026-10-17)
 
 HA kumanda yuzeyi (`ha.control.v1`, D1-A/D1-B): teknisyenin yayinladigi kumanda tanimlari
