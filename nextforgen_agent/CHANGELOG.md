@@ -1,5 +1,46 @@
 ﻿# Changelog
 
+## 1.1.52 (2026-10-26)
+
+Otomatik Ekran v6 acik HA servis yolu, hub tarafi (A-1). Yeni yetenek `system.hello` icinde
+`ha.service.v1` olarak ilan edilir. Kanonik (noktasiz) komut yolu ve mevcut mesaj kontratlari
+degismez; eski backend bu mesajlari gondermedigi icin davranis 1.1.51 ile aynidir.
+
+- **feat(command):** cloud `device.command` icinde noktali fiil (`"action":"domain.service"`)
+  translator'a girmeden dogrudan HA servisine gider. Sahiplik kontrolu korunur; agent politika
+  aynasi (domain esitligi, yasak domain/servis, deger kurallari) ve son kabul edilen aktivasyonun
+  ACIK olmasi sarttir. Ret `device.command_result {success:false, error}` olarak doner.
+- **feat(policy):** `ha.policy.activation {open, domains, issuedAt, ttl}` kalici tutulur
+  (`/data/agent/ha-policy-activation.json`, varsayilan KAPALI). Eski `issuedAt` yok sayilir;
+  `open:false` aninda kapatir; `open:true` icin ttl [60,3600] disi / bozuk payload yok sayilir.
+  TTL yerel alis zamanindan sayilir ve yalniz LAN'i keser. Aktivasyon domainleri (media_player vb.)
+  engelli domain listesini deler; degisince registry yeniden kurulur ve `device.list` gonderilir.
+- **feat(report):** `hub.ha_services {services:{domain:[servis]}}` tam anlik goruntu (<= 32768 bayt):
+  HA servisleri ∩ registry entity domainleri ∩ yayinlanabilir servisler. Hello sonrasi ve HA
+  `service_registered`/`service_removed` olaylarinda (>= 2 sn debounce) gonderilir.
+- **feat(lan):** `/local/v1/health` ek `ha_service:{open, domains, ttl}` alani yazar. Noktali
+  `/ha-command` sirasi: 409 `policy_closed` -> 400 `entity_not_found` -> 400 `action_not_allowed`/
+  `invalid_value` -> 409 `hub_not_ready` -> 502 `service_call_failed` (retryable). Bu yolda 403/500
+  yok. Noktasiz `/ha-command` ve `/command` bayt-ayni kalir.
+- **fix(activation):** `ha.policy.activation` WS alis sirasiyla tek tuketicili kuyrukta islenir
+  (alis dongusu ve diger mesaj tipleri I/O beklemez). Aktivasyon WS oturumuna baglidir: eski
+  oturumdan gec gelen mesaj HICBIR durumu degistirmeden reddedilir; oturum basi/sonu ve uygulama
+  ayni kilit altindadir. Oturum biterken kuyrukta kalanlar sirayla yalniz durum olarak uygulanir.
+- **fix(rollback):** cloud `device.list` ve cloud komut gorunumu, yalniz GECERLI oturum ACIK
+  aktivasyon aldiysa delinir; aksi halde (eski backend, oturumsuz) 1.1.51 filtresi aynen kalir.
+  Kalici LAN delmesi ayri gorunumdur (kendi TTL'i). Kalici delme varken ilk `device.list` en cok
+  5 sn ilk aktivasyonu bekler (eksik cihaz -> backend'de sahte "cevrimdisi" olmasin); kapali
+  aktivasyon ya da zaman asiminda eski filtreyle gonderilir.
+- **fix(lan/cloud):** cozulemeyen metin (eslesmemis vekil `\uD800` vb.) iceren noktali govde
+  500 yerine 400 `invalid_value` (hedef cozulemezse `entity_not_found`); kok tarama asla istisna
+  atmaz. Noktasiz govde bayt-ayni eski sonucu verir.
+- **fix(report):** baglanti servis raporu oturum iptaline baglidir; yeni oturuma sarkmaz.
+- **test:** politika matrisi, aktivasyon sinirlari/kaliciligi, rapor filtresi/siniri, cloud ve LAN
+  noktali yol merdiveni, noktasiz yolun degismedigi; eski oturum / ayni saniye sira / bekleyen
+  kuyruk, eslesmemis vekil merdiveni, eski backend geri donus gorunumu ve ertelenen ilk liste.
+- **Manifest:** csproj `<Version>`/`<InformationalVersion>` 1.1.52 + `nextforgen_agent/config.yaml`
+  1.1.52.
+
 ## 1.1.51 (2026-10-18)
 
 Kalici durum add-on restart/update'inde kaybolmaz. Kok neden: agent imajindaki
