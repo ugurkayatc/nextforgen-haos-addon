@@ -1,5 +1,21 @@
 ﻿# Changelog
 
+## 1.1.53 (2026-10-27)
+
+Sahne kumandasi (control_slot) hub tarafi, PR2. Yeni yetenek `system.hello` icinde
+`ha.control.scene.v1` olarak ilan edilir. Bu surum henuz HUB'LARA DAGITILMAZ; backend bayragi
+(`Automations__ControlSlotEnabled`) kapali oldugu surece hicbir sahne bu yolu kullanmaz.
+
+- **feat(controls):** `control.call` icinde `expectedRevision` + `expectedActionId`: hub, slotu AYNI
+  snapshot'ta revizyon, icerik parmak izi ve sahne politikasina (yalniz parametresiz turn_on/turn_off)
+  karsi dogrular; uyusmazsa HA'ya cagri gitmez (`revision_mismatch` / `slot_not_eligible`).
+- Yarim sahne baglami (yalniz revizyon ya da yalniz parmak izi) `invalid_request` ile reddedilir.
+- Eski agent bu yetenegi ilan etmez; bulut sahne cagrisini ona GONDERMEZ (426 agent_upgrade_required).
+- **fix(controls):** Sahne cagrisinda HA hata ayrimi (yalniz sahne cagrilari; musteri cagrisi eskisi gibi):
+  HA **4xx** kesin ret = `ha_error` (bulut "uygulanmadi" der); HA **5xx / 408 / ag-zaman asimi** = `ha_unreachable`
+  (sonuc belirsiz; bulut `outcome_unknown` olarak isler, "uygulanmadi" DEMEZ). Gonderim aninda yetenek kaybi
+  `agent_upgrade_required` olarak doner (belirsiz sayilmaz).
+
 ## 1.1.52 (2026-10-26)
 
 Otomatik Ekran v6 acik HA servis yolu, hub tarafi (A-1). Yeni yetenek `system.hello` icinde
