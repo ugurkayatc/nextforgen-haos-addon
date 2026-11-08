@@ -1,5 +1,21 @@
 ﻿# Changelog
 
+## 1.1.54 (2026-11-07)
+
+Yerden isitma termostati haftalik program yazma, hub tarafi (Faz 1b PR-B). Yeni yetenek `system.hello`
+icinde `climate.schedule.v1` olarak ilan edilir. Hub'lara dagitim ayri adimdir (ikinci HAOS add-on
+deposundaki manifest); backend ayari (`ClimateSchedule__EditableLocations`) bos oldugu surece hicbir
+program yazma komutu gonderilmez.
+
+- **feat(climate):** bulut `device.command` icinde dar dal: hedef YALNIZ
+  `text.<onek>_schedule_<gun>` ve fiil noktasiz `set_value`; deger kanonik 6 gecis olmali (aksi
+  `invalid_value`). HA'ya yalniz `text.set_value` `{entity_id, value}` gider.
+- Savunma derinligi: HA'daki mevcut deger de kanonik 6 gecis degilse (stok 4 gecis, unavailable,
+  okunamiyor) yazilmaz (`schedule_format_unsupported`).
+- LAN yollari `text` domain'ini hala reddeder; acik servis yolu program entity'lerini `schedule_entity`
+  ile reddeder (backend politikasinin aynasi). Ceviriciye `text` EKLENMEDI.
+- HA hatasi sabit `service_call_failed` doner; ham HA govdesi sonuca ve loga girmez.
+
 ## 1.1.53 (2026-10-27)
 
 Sahne kumandasi (control_slot) hub tarafi, PR2. Yeni yetenek `system.hello` icinde
