@@ -1,6 +1,6 @@
 ﻿name: "NextForGen Agent"
 description: "NextForGen akÄ±llÄ± ev platformu hub baÄŸlantÄ± ajanÄ±. CihazlarÄ±nÄ±zÄ± NextForGen uygulamasÄ±ndan yÃ¶netmenizi saÄŸlar."
-version: "1.1.54"
+version: "1.1.58"
 slug: "nextforgen_agent"
 url: "https://nextforgen.com"
 arch:
@@ -46,6 +46,9 @@ options:
   log_level: "info"
   # IntegrationHealthSupervisor — hub başına açılır (teknisyen). Default KAPALI.
   integration_watchdog_enabled: false
+  # İklim Denetçisi — hub başına açılır (teknisyen). Default KAPALI; enforce (cihaza yazma) ayrıca açılır.
+  climate_supervisor_enabled: false
+  climate_supervisor_enforce: false
 
 schema:
   backend_url: url
@@ -57,6 +60,8 @@ schema:
   integration_watchdog_enabled: bool?
   # Opsiyonel S4c penceresi; set edilmezse run.sh 20sn (ürün SLO) kullanır.
   integration_watchdog_entity_recovery_timeout_sec: "int(20,600)?"
+  climate_supervisor_enabled: bool?
+  climate_supervisor_enforce: bool?
 
 # Docker image (GitHub Container Registry)
 image: "ghcr.io/ugurkayatc/agent"

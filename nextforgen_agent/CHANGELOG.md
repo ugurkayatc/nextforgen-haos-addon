@@ -1,5 +1,77 @@
 ﻿# Changelog
 
+## 1.1.58 (2026-11-16)
+
+Iklim Denetcisi S3a: takilma merdiveni (11-08 vakasi). Yalniz enforce acik ve abonelik varken.
+
+- **feat(climate):** isitma modunda taze olcum T-0,7 altinda ve 20 dk calismiyorsa: taze sorgu -> hedefi
+  (kullanicinin kendi degeri) yeniden yaz -> kapat ve kullanicinin moduna geri ac -> `[climate_stuck_unresolved]`
+  ERROR; basamaklar arasi 10 dk, asinma sinirlarina tabi.
+- **feat(climate):** kapat-ac sorumlulugu: gunluk once yazilir; yeniden acma kanitla dogrulanir
+  (`[climate_mode_restore_failed]`); yalniz kullanicinin mod/preset/ac/kapa komutu sorumlulugu bitirir, yalniz hedef
+  komutu cihazi kapali birakmaz; yeniden baslatmada eski mod ancak cihazin KAPALI oldugu goruluyorsa geri verilir.
+
+## 1.1.57 (2026-11-16)
+
+Iklim Denetcisi S2b: hedefte kes. Yalniz `climate_supervisor_enabled` + `climate_supervisor_enforce` acik, MQTT
+aboneligi (tazelik kaniti) var ve profil eslesiyorsa yazilir; geri donus 1.1.56 guvenlik cekirdegini kullanir.
+
+- **feat(climate):** isitirken taze olcum >= T ise hedef T-1 yazilir (gunluk once, maske epoch kontroluyle);
+  `pulse`: role durdugu taze dokumle dogrulaninca (<= 90 sn, yoksa `[climate_pulse_no_idle]`) T geri yuklenir;
+  `hold`: oda T-0,5'e inince ya da en cok `holdMaxMinutes` (180, `[climate_hold_max]`) sonra T.
+- **feat(climate):** asinma sinirlari: saatte <= 6 yazma (geri yuklemeler dahil), iki kesme arasi >= 20 dk; izinli
+  preset (manual/none) disinda kesme yok; kullanici hedefinin ustune asla yazilmaz.
+- **feat(climate):** belirsiz kesme yazmasi uzlastirmaya gider (60 sn gec uygulanabilir sayilir); kendi kesmemizin
+  HA yankisi 60 sn icinde "hedef zaten T" sayilmaz; hedef kararlari yalniz sorgu dokumuyle.
+
+## 1.1.56 (2026-11-16)
+
+Iklim Denetcisi S2a: guvenlik cekirdegi (docs/design/iklim-kontrol plan 5.2 kurallar 4-7). Bu surum cihaza YENI
+BIR KESME YAZMAZ; yalniz gunlukte acik bir cevrimi kullanicinin KENDI degerine dondurur. Kesme 1.1.57'de, takilma
+merdiveni 1.1.58'de gelir. Gunluk bossa davranis 1.1.55 ile ayni (sifir yazma).
+
+- **feat(climate):** kullanici her zaman ustundur: bulut, LAN ve kumanda cagrilarinin ortak bogazi
+  (`HaRestClient.CallServiceAsync`) HA'dan ONCE denetciyi bilgilendirir; denetlenen cihazin her entity'si icin
+  epoch + 120 sn sessiz pencere (backend komut dogrulama penceresi); istenen hedef uzlastirmada dogrulanir; uctaki
+  denetci yazmasi (en cok 5 sn) bitene kadar kullanici cagrisi en cok 6 sn bekler (kumanda 15 sn sinirinin altinda).
+- **feat(climate):** `/data/agent/climate-supervisor.json` gunlugu her denetci yazmasindan ONCE atomik yazilir;
+  ardindan epoch kullanici isaretiyle atomik yeniden kontrol edilir (degistiyse yazma yok, gunluk geri alinir).
+  Kayitlar dogrulanir (bilinen profilli entity, sonlu sayilar, dip = hedef - dipC, HA min/max, gecerli faz);
+  gecersiz kayit WARN ile atilir, bozuk dosya motoru dusurmez.
+- **feat(climate):** geri yukleme kanitla biter (HTTP 200 uygulandi sayilmaz): taze sorgu dokumu, abonelik yoksa
+  yazmadan SONRA guncellenen HA durumu; o zamana dek gunluk acik; 5 deneme sonra `[climate_restore_failed]`.
+- **feat(climate):** uzlastirma: kullanici komutu, duvar/otomasyon degisikligi, belirsiz (zaman asimi) yazma ve
+  yeniden baslatma; istenen/baska deger benimsenir, cihaz hala denetci degerindeyse son onayli hedef geri yuklenir
+  `[climate_user_command_not_applied]`; bayat denetci yazmasi kullanici degerinin ustune gec uygulandiysa kullanici
+  degeri bir kez yeniden yazilir `[climate_stale_write_reapply]`.
+- **feat(climate):** yalniz-geri-yukleme: enforce kapali, abonelik/HA WS dustu ya da
+  `climate_supervisor_enabled: false` iken bile acik gunluk kullanici degerine dondurulur (Enabled=false: abonelik ve
+  sorgu yok, kanit HA durumu, gunluk bosalinca servis durur `[climate_obligation]`).
+- **feat(climate):** durust gosterim: denetcinin yazdigi deger (yalniz o) arka uca/LAN'a kullanici hedefi olarak
+  gider + `nfg_supervisor_active: true`; maske kalkinca guncel HAM durum `last_updated` +1 ms ile yeniden yayinlanir.
+- **feat(climate):** HA WS kopunca MQTT aboneligi gecersiz sayilir; yayindan sonraki 300 ms icindeki mesaj sorgu
+  yaniti sayilmaz.
+
+**Guvenli geri alma sirasi** (kesme surumleri icin): (1) `climate_supervisor_enforce: false`; (2) logda
+`geri yüklendi (doğrulandı)` satiri ya da gunluk `[]`; (3) sonra `climate_supervisor_enabled: false`. (3) erken
+yapilsa da acik gunluk kapanana kadar yalniz geri yukleme icin calisir.
+
+## 1.1.55 (2026-11-16)
+
+Iklim Denetcisi S1 (docs/design/iklim-kontrol plan 5.2): profil kayit defteri + salt-okunur taze olcum. CIHAZA
+YAZMA YOK. Varsayilan KAPALI; hub basina `climate_supervisor_enabled` ile acilir (`climate_supervisor_enforce`
+bu surumde hicbir sey yazdirmaz). Hub'lara dagitim ayri adimdir (ikinci HAOS add-on deposundaki manifest).
+
+- **feat(climate):** agent'a gomulu, surumlu `climate-profiles.json` (Beok BOT-R9V-ZB, `limited`). Kati dogrulama:
+  bilinmeyen/eksik alan, aralik disi deger, bilinmeyen yontem/strateji, cakisan eslesme -> TUM defter bos (fail-closed).
+  Eslesme hub'da HA kaydindan: entegrasyon platformu + uretici + model_id (yoksa "... (MODEL_ID)" model metni).
+  Profilsiz iklim cihazlari (or. tuya_local fan coil) yok sayilir.
+- **feat(climate):** taze olcum: eslesen cihaza HA `mqtt.publish` ile Tuya `dataQuery` (acikken 5 dk, kapaliyken
+  30 dk, +/- jitter, cihaz basina tek bekleyen sorgu, yanitsizlikta 2^n geri cekilme). Yanit HA `mqtt/subscribe`
+  ile Z2M durum topic'inden gozlenir (retained mesaj taze sayilmaz); her dokum yapilandirilmis log satiridir.
+  HA aboneligi reddederse sorgu yalniz HA'yi tazeler, tazelik kaniti olmadigi icin karar verilmez.
+- `HaDeviceInfo`'ya `model_id` + `identifiers` (ham) eklendi; registry kontrati degismedi.
+
 ## 1.1.54 (2026-11-07)
 
 Yerden isitma termostati haftalik program yazma, hub tarafi (Faz 1b PR-B). Yeni yetenek `system.hello`
