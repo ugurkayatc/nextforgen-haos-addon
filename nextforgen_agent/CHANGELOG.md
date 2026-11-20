@@ -1,5 +1,16 @@
 ﻿# Changelog
 
+## 1.1.62 (2026-11-18)
+
+Duvar paneli "yalniz yerel hub" (A1b): panel LAN WS aboneliginde canli baslangic durumu. Yalniz panel principal'i;
+telefonlarin (1.1.0/85 dahil) WS akisi ve `/local/v1/devices` yaniti degismez.
+
+- **feat(lan):** panel `/local/v1/states` aboneligi acilinca gorunur cihazlarinin GUNCEL HA durumu (REST `/api/states`,
+  Iklim Denetcisi maskesi uygulanmis) canli olayla ayni `device.state_changed` zarfinda ve ayni gorunurluk filtresiyle
+  bir kez gonderilir (en fazla 2000 olay, HA icin 5 sn).
+- **fix(lan):** patlama surerken gelen canli olaylar o abone icin siraya alinir ve patlamadan sonra ayni sirayla gider
+  (eski anlik goruntu yeni olayi ezemez; diger aboneler beklemez). HA hatasi -> patlama atlanir, baglanti surer.
+
 ## 1.1.58 (2026-11-16)
 
 Iklim Denetcisi S3a: takilma merdiveni (11-08 vakasi). Yalniz enforce acik ve abonelik varken.
