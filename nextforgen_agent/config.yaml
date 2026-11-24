@@ -1,6 +1,6 @@
 ﻿name: "NextForGen Agent"
 description: "NextForGen akÄ±llÄ± ev platformu hub baÄŸlantÄ± ajanÄ±. CihazlarÄ±nÄ±zÄ± NextForGen uygulamasÄ±ndan yÃ¶netmenizi saÄŸlar."
-version: "1.1.63"
+version: "1.1.62"
 slug: "nextforgen_agent"
 url: "https://nextforgen.com"
 arch:
@@ -20,11 +20,7 @@ hassio_role: admin
 # Agent bunu HA eriÅŸimi iÃ§in kullanÄ±r
 
 # AÄŸ yapÄ±landÄ±rmasÄ±
-# host_network (1.1.61): mDNS servis yayini (_nextforgen-hub._tcp) LAN'a ancak host aginda cikar (kopru agi
-# multicast'i LAN'a tasimaz). Supervisor host-network add-on'a da "supervisor"/"hassio" host eslemesini verir
-# (extra_hosts) -> http://supervisor/core ayni calisir. host_network'te asagidaki "ports" eslemesi Supervisor
-# tarafindan yok sayilir; agent 9100'u host'ta dogrudan dinler. Rollback = host_network: false ile yeni surum.
-host_network: true
+host_network: false
 ports:
   9100/tcp: 9100
 ports_description:
