@@ -1,5 +1,39 @@
 ﻿# Changelog
 
+## 1.1.63 (2026-11-24)
+
+Duvar paneli "yalniz yerel hub": 1.1.59 (A1) + 1.1.61 (A3) dallari ve panel kilit sunucu kurali (#566) tek surumde.
+1.1.59/1.1.61 hic yayinlanmadi; asagidaki iki blok bu surumun parcasidir. Once yalniz test hub.
+
+- **fix(panel):** panel principal'i LAN'dan kilit ACAMAZ: `/command`, `/ha-command` ve acik (noktali) yolda
+  `lock.unlock`/`lock.open` ve cevrilemeyen kilit eylemleri HA cagrisi yapilmadan 403 `panel_lock_action_denied`
+  (kilitleme serbest). Insan token'lari (telefon, 1.1.0/85 dahil) etkilenmez.
+
+### A1 (LAN v2)
+
+Duvar paneli "yalniz yerel hub" (LAN v2, A1). Bayraksiz ama davranis backend kapili: backend 30 gunluk panel
+token'ini yalniz `lan.panel_token.v2` ilan eden hub'a verir; vermedikce bugunku 7 gun aynen gecerli.
+
+- **feat(lan):** `pk=panel` token'i icin dogrulama ust siniri 30 gun; insan token'lari 7 gunde kalir.
+- **fix(lan):** iptal kaydi, kapsadigi en uzun token dolana dek (nbf + 30 gun + saat sapmasi) saklanir ve uygulanir;
+  backend'in 7 gunluk `exp` ile yazdigi satir 30 gunluk panel token'ini erken serbest birakamaz.
+- **feat(hello):** `lanAddresses` = hub'in ozel IPv4 LAN adresleri + host portu (Supervisor `/network/info` +
+  `/addons/self/info`); yalniz ipucu, hata/eksik -> bos dizi, hello en fazla 2 sn bekler (onbellek 10 dk).
+- **feat(lan):** `/command` ve `/ha-command` basari govdesine `durationMs` (eklemeli; `success:true` ayni).
+- **feat(hello):** capability `lan.panel_token.v2`.
+
+### A3 (host agi + yalniz-LAN mDNS)
+
+Duvar paneli "yalniz yerel hub" (A3): add-on host aginda. Once yalniz test hub; musteri hub'larina yayilim ayri onay.
+Rollback = `host_network: false` ile yeni surum (ya da add-on yedegi).
+
+- **feat(addon):** `host_network: true` -> `_nextforgen-hub._tcp` mDNS yayini LAN'a cikar (telefonlarin mevcut
+  "bulut yoksa LAN" yedegi ve panel PTR kesfi ilk kez fiilen bulur). TXT `loc/fp/v` ve port 9100 ayni.
+- **fix(mdns):** host aginda yayin yalniz ozel LAN IPv4 adreslerini (RFC1918; hassio 172.30.32.0/23 ve docker0
+  172.17.0.0/16 haric) ve o arayuzleri kullanir: 1.1.0 (85) ilk A kaydini alir, docker/Tailscale adresi gitmez.
+  Ozel LAN IPv4 yoksa (acilista DHCP bitmemis, kablo yok, kopru agi) yayin YAPILMAZ (fail-closed; filtresiz yayin
+  docker/Tailscale adresini sizdirirdi); 15 sn'lik dongu LAN gelince yayini baslatir, adres degisince yeniler.
+
 ## 1.1.62 (2026-11-18)
 
 Duvar paneli "yalniz yerel hub" (A1b): panel LAN WS aboneliginde canli baslangic durumu. Yalniz panel principal'i;
